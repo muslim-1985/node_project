@@ -19,7 +19,7 @@ app.get('/', async (req, res, next) => {
 
 app.get('/artists', async (req, res) => {
 	try {
-		//метод get экспортируется из файла подключния /db.connect к БД для унификации подключения
+		//метод get экспортируется из файла подключния /db.connect к БД для унификации подключения ок
 		const result = await db.get().collection('artists').find().toArray();
 		res.send(result);
 
