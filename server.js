@@ -1,10 +1,11 @@
-let express = require('express');
-let bodyParser = require('body-parser');
-let ObjectID = require('mongodb').ObjectID;
+const express = require('express');
+const bodyParser = require('body-parser');
+const ObjectID = require('mongodb').ObjectID;
 //файл подключения к БД
-let db = require('./db.connect');
-let app = express();
-
+const db = require('./db.connect');
+const artistController = require ('./controllers/artists');
+const app = express();
+let ar = new artistController;
 app.use(bodyParser.urlencoded({ extended: true }));
 // // parse application/json
 app.use(bodyParser.json());
@@ -17,17 +18,8 @@ app.get('/', async (req, res, next) => {
 	}
 });
 
-app.get('/artists', async (req, res) => {
-	try {
-		//метод get экспортируется из файла подключния /db.connect к БД для унификации подключения ок
-		const result = await db.get().collection('artists').find().toArray();
-		res.send(result);
+app.get('/artists', ar.getAll);
 
-	} catch (e) {
-		res.sendStatus(500);
-		console.log(e);
-	}
-});
 app.get('/artists/:id', async (req, res) => {
 	try {
 		const search = await db.get().collection('artists').findOne({_id : ObjectID(req.params.id)});
