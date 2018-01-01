@@ -1,17 +1,10 @@
-let MongoClient = require('mongodb').MongoClient;
-let state = {
-    db: null
-};
+let mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 exports.connect = async (url, done) => {
-    if(state.db) {
-        return done();
-    }
     try {
-    	const ok = await MongoClient.connect(url);
-        state.db = ok.db('webapp');
+    	await mongoose.connect(url);
         done();
     } catch(e) {
     	console.log(e);
     }
 };
-exports.get = () => state.db;

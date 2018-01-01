@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const ObjectID = require('mongodb').ObjectID;
 //файл подключения к БД
 const db = require('./db.connect');
-const artistController = require ('./controllers/artists');
+const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
+const Artist = require('./controllers/artists');
 const app = express();
-let ar = new artistController;
 app.use(bodyParser.urlencoded({ extended: true }));
 // // parse application/json
 app.use(bodyParser.json());
@@ -18,53 +18,11 @@ app.get('/', async (req, res, next) => {
 	}
 });
 
-app.get('/artists', ar.getAll);
-
-app.get('/artists/:id', async (req, res) => {
-	try {
-		const search = await db.get().collection('artists').findOne({_id : ObjectID(req.params.id)});
-		res.send(search);
-	} catch (e) {
-		res.sendStatus(500);
-		console.log(e);
-	}
-});
-app.put('/artists/:id', async (req, res) => {
-	try {
-		await db.get().collection('artists').updateOne(
-			{"_id" : ObjectID(req.params.id)},
-			//добавляем модификатор записи $set по новым стандартам
-			{$set: {"name" : req.body.name}}
-		);
-		res.sendStatus(200);
-	} catch (e) {
-		res.sendStatus(500);
-		console.log(e);
-	}
-});
-app.delete('/artists/:id', async (req, res) => {
-	try {
-		await db.get().collection('artists').deleteOne({_id:ObjectID(req.params.id)});
-		res.sendStatus(200);
-	} catch(e) {
-		res.sendStatus(500);
-		console.log(e);
-	}
-});
-app.post('/artists', async (req, res) => {
-
-	 let artist = {
-				name: req.body.name
-			};
-	try {
-		await db.get().collection('artists').insertOne(artist);
-		res.send(artist)
-	} catch (e) {
-		res.sendStatus(500);
-		console.log(e);
-	}
-
-});
+app.post('/artists', Artist.setAr);
+app.get('/artists', Artist.getAll);
+app.get('/artists/:id', Artist.showOne);
+app.put('/artists/:id/update', Artist.actionUpdate);
+app.delete('/artists/:id/delete', Artist.actionDelete);
 
 db.connect('mongodb://localhost:27017/webapp', async (err) => {
 		if(err) {

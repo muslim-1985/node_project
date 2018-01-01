@@ -1,11 +1,58 @@
 const Artists = require ('../models/artists');
-module.exports = class ArtistController extends Artists{
+let newArtists = new Artists();
+module.exports = setArtits = {
+    async setAr(req, res) {
+        newArtists.name = req.body.name;
+        try {
+            const sent = await newArtists.save();
+            res.send(sent);
+        } catch(e) {
+            console.log(e);
+        }
+    },
     async getAll (req, res) {
         try {
-            let send = await super.all();
-            res.send(send);
+            let result = await Artists.find({});
+            res.send(result);
+        } catch (e) {
+            console.log(e);
+        }
+    },
+    async showOne (req, res) {
+        try {
+            let show = await Artists.findById(req.params.id);
+            res.send(show);
+        } catch (e) {
+            console.log(e);
+        }
+    },
+    async actionUpdate (req, res) {
+        try {
+            let update = await Artists.findByIdAndUpdate(req.params.id,{name: req.body.name});
+            console.log(update);
+            res.send(update);
+        } catch (e) {
+            console.log(e);
+        }
+    },
+    async actionDelete (req, res) {
+        try{
+            let del = await Artists.findByIdAndRemove(req.params.id);
+            console.log(del);
+            res.send(del);
         } catch (e) {
             console.log(e);
         }
     }
 };
+
+// module.exports = class ArtistController extends Artists{
+//     async actionDelete (req, res) {
+//         try {
+//             const del = await super.delete(req.params.id);
+//             res.send(del);
+//         } catch(e) {
+//             console.log(e);
+//         }
+//     }
+// };

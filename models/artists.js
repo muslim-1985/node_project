@@ -1,11 +1,10 @@
-const db = require('../db.connect');
-module.exports  = class Artists {
-   async all () {
-       try {
-           let log = await db.get().collection('artists').find().toArray();
-           return log;
-       } catch (e) {
-           console.log(e);
-       }
-   };
-};
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const artistSchema = new Schema({
+    name: String,
+    name: {
+        type: String,
+        required: true
+    }
+});
+module.exports = mongoose.model('Artist', artistSchema);
