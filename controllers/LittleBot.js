@@ -1,5 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
-const TOKEN = '450864867:AAHMugEUo88BSJIAcZzPYrEm1FuB4EMVvVc';
+//require config file
+const config = require('../config/config');
+//bot token take config file
+const TOKEN = config.app.botToken;
 const bot = new TelegramBot(TOKEN, {polling: true});
 //bot.setWebHook('https://0fd40e7a.ngrok.io/bot');
 
