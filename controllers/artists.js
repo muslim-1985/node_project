@@ -13,7 +13,7 @@ module.exports = setArtits = {
     async getAll (req, res) {
         try {
             let result = await Artists.find({});
-            res.send(result);
+            res.render('artists.html', {artists: result});
         } catch (e) {
             console.log(e);
         }

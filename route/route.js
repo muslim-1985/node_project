@@ -1,5 +1,5 @@
-const express = require('express');
-const route = express.Router();
+const app = require('express');
+const route = app.Router();
 const bodyParser = require('body-parser');
 const Artist = require('../controllers/artists');
 const LittleBot = require('../controllers/LittleBot');
@@ -9,7 +9,7 @@ route.use(bodyParser.json());
 
     route.get('/', async (req, res, next) => {
         try {
-            res.send('hello api');
+            res.render('index.html');
         } catch(e) {
             next(e);
         }

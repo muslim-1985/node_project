@@ -5,6 +5,13 @@ const db = require('./db.connect');
 const routes = require('./route/route');
 //config file required
 const config = require('./config/config');
+//nunjucks template engine
+const nunjucks = require('nunjucks');
+//template engine configure
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app
+});
 //  Connect all our routes to our application
 app.use('/', routes);
 
