@@ -1,8 +1,9 @@
 const app = require('express');
 const route = app.Router();
+//const config = require('../config/config');
 const bodyParser = require('body-parser');
 const Artist = require('../controllers/artists');
-const LittleBot = require('../controllers/LittleBot');
+//const LittleBot = require('../controllers/LittleBot');
 route.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 route.use(bodyParser.json());
@@ -20,6 +21,6 @@ route.use(bodyParser.json());
     route.put('/artists/:id/update', Artist.actionUpdate);
     route.delete('/artists/:id/delete', Artist.actionDelete);
 
-    //route.get('/bot', LittleBot.BotMsg);
+    //route.post(`/${config.app.botToken}`, LittleBot.BotMsg);
 
 module.exports = route;

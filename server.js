@@ -1,4 +1,9 @@
-const app = require('express')();
+const express = require('express');
+const exp = express();
+//http server app
+const app = require('http').Server(exp);
+//web socket server app
+require('./socket')(app);
 //файл подключения к БД
 const db = require('./db.connect');
 //Routes file export
@@ -10,12 +15,14 @@ const nunjucks = require('nunjucks');
 //template engine configure
 nunjucks.configure('views', {
     autoescape: true,
-    express: app
+    express: exp
 });
+//static file path
+exp.use(express.static(config.app.staticPath));
 //  Connect all our routes to our application
-app.use('/', routes);
+exp.use('/', routes);
 
-db.connect('mongodb://'+config.db.host+':'+config.db.port+'/'+config.db.name, async (err) => {
+db.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, async (err) => {
 		if(err) {
 			console.log(err);
 		}

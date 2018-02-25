@@ -1,6 +1,7 @@
 const Artists = require ('../models/artists');
 let newArtists = new Artists();
-module.exports = setArtits = {
+
+module.exports = {
     async setAr(req, res) {
         newArtists.name = req.body.name;
         try {

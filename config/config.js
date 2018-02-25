@@ -6,7 +6,10 @@ const env = process.env.NODE_ENV; // 'dev' or 'test'
 const dev = {
     app: {
         port: parseInt(process.env.DEV_APP_PORT) || 3000,
-        botToken: process.env.BOT_TOKEN
+        botToken: process.env.BOT_TOKEN,
+        sslConnect: process.env.SSL_CONNECT,
+        //files static path server.js include
+        staticPath: 'views'
     },
     db: {
         host: process.env.DEV_DB_HOST || 'localhost',
