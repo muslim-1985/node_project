@@ -14,7 +14,10 @@ route.use(bodyParser.json());
 
 function checkAuth (req, res, next) {
     passport.authenticate('jwt', { session: false }, (err, decryptToken, jwtError) => {
-        if(jwtError != void(0) || err != void(0)) return res.render('admin.html', { error: err || jwtError});
+        if(jwtError != void(0) || err != void(0)) {
+            console.log(jwtError);
+            return res.render('admin.html', { error: err || jwtError});
+        }
         req.user = decryptToken;
         next()
     })(req, res, next);
@@ -29,7 +32,7 @@ route.post('/logout', (req, res) => {
     res.clearCookie('token');
     res.status(200).send({message: "Logout success."});
 });
-    route.post('/artists', Artist.setAr);
+    route.post('/artists', checkAuth, Artist.setAr);
     route.get('/artists', Artist.getAll);
     route.get('/artists/:id', Artist.showOne);
     route.put('/artists/:id/update', Artist.actionUpdate);
