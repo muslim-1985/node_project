@@ -19,7 +19,7 @@ const dev = {
         jwt: {
             jwtFromRequest: ExtractJwt,
             secretOrKey: 'TfbTq2NfLzqMcbVY9EpGQ2p'
-        }
+        },
     },
     db: {
         host: process.env.DEV_DB_HOST || 'localhost',

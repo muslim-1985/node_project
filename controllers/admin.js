@@ -21,13 +21,10 @@ module.exports = {
             let user = await UsersModel.findOne({username: {$regex: _.escapeRegExp(req.body.username), $options: "i"}}).lean().exec();
             if(user != void(0) && bcrypt.compareSync(req.body.password, user.password)) {
                 const token = createToken({id: user._id, username: user.username});
-                // res.cookie('token', token, {
-                //     httpOnly: true
-                // });
-                console.log(token);
-
-                res.json({authorization: 'Bearer'+ ' '+token, message: "User login success."});
-                //res.status(200).send({message: "User login success."});
+                res.cookie('token', token, {
+                    httpOnly: true
+                });
+                res.status(200).send({message: "User login success."});
             } else res.status(400).send({message: "User not exist or password not correct"});
         } catch (e) {
             console.error("E, login,", e);
@@ -50,12 +47,10 @@ module.exports = {
 
             const token = createToken({id: user._id, username: user.username});
 
-            // res.cookie('token', token, {
-            //     httpOnly: true
-            // });
-            return res.json({authorization: 'Bearer'+ ' ' +token, message: "User created."});
-
-            //res.status(200).send({message: "User created."});
+            res.cookie('token', token, {
+                httpOnly: true
+            });
+            res.status(200).send({message: "User created."});
 
         } catch (e) {
             console.error("E, register,", e);
