@@ -7,29 +7,28 @@ require('./socket')(app);
 //файл подключения к БД
 const db = require('./db.connect');
 //Routes file export
-const routes = require('./route/route');
+const routes = require('./routes/route');
 const cookieParser = require('cookie-parser');
 //config file required
 const config = require('./config/config');
-//nunjucks template engine
-const nunjucks = require('nunjucks');
 //passport jwt module add
 const passport = require('passport');
 const {Strategy, ExtractJwt} = require('passport-jwt');
 
-//template engine configure
-nunjucks.configure('views', {
-    autoescape: true,
-    express: exp
-});
 //static file path
 exp.use(express.static(config.app.staticPath));
 exp.use(cookieParser());
 //  Connect all our routes to our application
 exp.use('/', routes);
+//получаем jwt токен из заголовков fromAuthHeaderAsBearerToken()
+//и сравниваем с секретным ключем
+let jwtOptions = {
+	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+	secretOrKey: config.app.jwt.secretOrKey
+};
 
-passport.use(new Strategy(config.app.jwt, function(jwt_payload, done) {
-    if(jwt_payload != void(0)) {
+passport.use(new Strategy(jwtOptions, function(jwt_payload, done) {
+    if(jwt_payload) {
     	return done(false, jwt_payload);
     }
     done();

@@ -8,13 +8,19 @@ function createToken (body) {
     return jwt.sign(
         body,
         config.app.jwt.secretOrKey,
-        {expiresIn: '1h'}
+        {expiresIn: '7h'}
     );
 }
 
 module.exports = {
     async resPage (req, res) {
-        res.render('admin.html', { username: req.user.username });
+        try {
+            res.status(200).send('Новая страница');
+        } catch (e) {
+            res.status(500).send('Ошибка сервера');
+            console.log(e)
+        }
+
     },
     async login (req, res) {
         try {
@@ -23,9 +29,9 @@ module.exports = {
                 const token = createToken({id: user._id, username: user.username});
                 res.cookie('token', token, {
                     httpOnly: true
-                });
-                res.status(200).send({message: "User login success."});
-            } else res.status(400).send({message: "User not exist or password not correct"});
+                }).json({message: "User login success", token});
+            }
+             else res.status(400).send({message: "User not exist or password not correct"});
         } catch (e) {
             console.error("E, login,", e);
             res.status(500).send({message: "some error"});
@@ -49,8 +55,7 @@ module.exports = {
 
             res.cookie('token', token, {
                 httpOnly: true
-            });
-            res.status(200).send({message: "User created."});
+            }).json({message: "ok", token});
 
         } catch (e) {
             console.error("E, register,", e);

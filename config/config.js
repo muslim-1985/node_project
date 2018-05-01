@@ -3,11 +3,11 @@ require('dotenv').load();
 
 const env = process.env.NODE_ENV; // 'dev' or 'test'
 //формирование в куках и возврат токена
-function ExtractJwt (req) {
-    let token = null;
-    if(req.cookies && req.cookies.token != void(0)) token = req.cookies['token'];
-    return token;
-}
+// function ExtractJwt (req) {
+//     let token = null;
+//     if(req.cookies && req.cookies.token != void(0)) token = req.cookies['token'];
+//     return token;
+// }
 
 const dev = {
     app: {
@@ -17,8 +17,7 @@ const dev = {
         //files static path server.js include
         staticPath: 'views',
         jwt: {
-            jwtFromRequest: ExtractJwt,
-            secretOrKey: 'TfbTq2NfLzqMcbVY9EpGQ2p'
+            secretOrKey: process.env.SECRET_OR_KEY
         },
     },
     db: {
