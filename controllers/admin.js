@@ -17,6 +17,7 @@ module.exports = {
         try {
             res.status(200).send('Новая страница');
         } catch (e) {
+            console.log(req);
             res.status(500).send('Ошибка сервера');
             console.log(e)
         }
@@ -42,8 +43,6 @@ module.exports = {
         try {
             let user = await UsersModel.findOne({username: {$regex: _.escapeRegExp(req.body.username), $options: "i"}}).lean().exec();
             if(user != void(0)) return res.status(400).send({message: "Пользователь уже зарегестрирован в системе"});
-            //проверяем повторение пароля
-            if(req.body.password !== req.body.forgotPass) return res.status(400).send({message: "Ваши пароли не совпадают"});
             //создаем юзера
             user = await UsersModel.create({
                 username: req.body.username,
