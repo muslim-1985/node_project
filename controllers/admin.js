@@ -15,9 +15,10 @@ function createToken (body) {
 module.exports = {
     async resPage (req, res) {
         try {
-            res.status(200).send('Новая страница');
+            let users = await UsersModel.find({});
+            res.status(200).json(users);
         } catch (e) {
-            console.log(req);
+            console.log(e);
             res.status(500).send('Ошибка сервера');
             console.log(e)
         }
