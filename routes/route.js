@@ -1,7 +1,6 @@
 const app = require('express');
 const exp = app();
 const route = app.Router();
-//const config = require('../config/config');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const Artist = require('../controllers/artists');
@@ -23,7 +22,10 @@ route.use(function(req, res, next) {
 });
 
 route.options('/', cors());
+route.options('/goods', cors());
 route.get('/', checkAuth, Admin.resPage);
+route.post('/info', Admin.setCategory);
+route.get('/goods', checkAuth, Admin.getCategory);
 route.post('/login', Admin.login);
 
 route.post('/register', Admin.register);

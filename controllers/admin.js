@@ -1,4 +1,5 @@
 const UsersModel = require('../models/UsersModel');
+const CategoryModel = require('../models/CategoryModel');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -23,6 +24,24 @@ module.exports = {
             console.log(e)
         }
 
+    },
+    async setCategory (req ,res) {
+      try {
+          let category = await CategoryModel.create({
+              category: req.body.category,
+          });
+          res.json(category)
+      }  catch (e) {
+          console.log(e);
+      }
+    },
+    async getCategory (req, res) {
+      try {
+          let result = await CategoryModel.find({});
+          res.status(200).json(result);
+      }  catch (e) {
+          console.log(e);
+      }
     },
     async login (req, res) {
         try {
