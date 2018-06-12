@@ -1,5 +1,6 @@
 const UsersModel = require('../models/UsersModel');
 const CategoryModel = require('../models/CategoryModel');
+const GoodModel = require('../models/GoodModel');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -39,6 +40,28 @@ module.exports = {
       try {
           let result = await CategoryModel.find({});
           res.status(200).json(result);
+      }  catch (e) {
+          console.log(e);
+      }
+    },
+    async setGood (req, res) {
+      try {
+          console.log(req.body);
+          let good = await GoodModel.create({
+              name: req.body.name,
+              price: req.body.price,
+              image: req.body.image,
+              category: req.body.category
+          });
+          res.status(200).json(good)
+      }  catch (e) {
+          console.log(e);
+      }
+    },
+    async getGood (req, res) {
+      try {
+          let getGood = await GoodModel.find({}).populate('category');
+          res.status(200).json(getGood);
       }  catch (e) {
           console.log(e);
       }

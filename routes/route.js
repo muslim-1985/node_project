@@ -23,9 +23,14 @@ route.use(function(req, res, next) {
 
 route.options('/', cors());
 route.options('/goods', cors());
+route.options('/getGood', cors());
+
 route.get('/', checkAuth, Admin.resPage);
 route.post('/info', Admin.setCategory);
+route.post('/setGood', Admin.setGood);
+route.get('/getGood', checkAuth, Admin.getGood);
 route.get('/goods', checkAuth, Admin.getCategory);
+
 route.post('/login', Admin.login);
 
 route.post('/register', Admin.register);
