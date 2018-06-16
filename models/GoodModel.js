@@ -5,7 +5,7 @@ mongoose.model('CategoryModel');
 const GoodModel = new Schema({
     name: {type: String},
     price: {type: String},
-    image: {type: String},
+    image: {data: Buffer, type: String},
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'CategoryModel'

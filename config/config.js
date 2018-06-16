@@ -2,12 +2,6 @@
 require('dotenv').load();
 
 const env = process.env.NODE_ENV; // 'dev' or 'test'
-//формирование в куках и возврат токена
-// function ExtractJwt (req) {
-//     let token = null;
-//     if(req.cookies && req.cookies.token != void(0)) token = req.cookies['token'];
-//     return token;
-// }
 
 const dev = {
     app: {

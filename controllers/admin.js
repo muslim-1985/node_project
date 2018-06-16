@@ -2,6 +2,7 @@ const UsersModel = require('../models/UsersModel');
 const CategoryModel = require('../models/CategoryModel');
 const GoodModel = require('../models/GoodModel');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const config = require('../config/config');
@@ -45,12 +46,13 @@ module.exports = {
       }
     },
     async setGood (req, res) {
+      let imgRoot = '/public/images';
       try {
           console.log(req.body);
           let good = await GoodModel.create({
               name: req.body.name,
               price: req.body.price,
-              image: req.body.image,
+              image: fs.readFileSync(imgRoot),
               category: req.body.category
           });
           res.status(200).json(good)
