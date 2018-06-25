@@ -5,13 +5,25 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const Artist = require('../controllers/artists');
 const Admin = require('../controllers/admin');
+const multer = require('multer');
 const {checkAuth} = require('../middlewares/checkAuth');
+//промежуточная функция сохранения файла на сервере и в бд
+const storage = multer.diskStorage({
+    destination (req, file, cb) {
+        cb(null, './public/images');
+    },
+    filename (req, file ,cb) {
+        cb(null, new Date().toISOString() + file.originalname);
+    }
+});
+
+const upload = multer({storage});
 //json parse body parser
 exp.use(bodyParser.json());
 //cors enabled by libs
 exp.use(cors());
 //const LittleBot = require('../controllers/LittleBot');
-route.use(bodyParser.urlencoded({ extended: true }));
+exp.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 route.use(bodyParser.json());
 //enabled CORS
@@ -24,27 +36,29 @@ route.use(function(req, res, next) {
 route.options('/', cors());
 route.options('/goods', cors());
 route.options('/getGood', cors());
+route.options('/deleteGood', cors());
 
 route.get('/', checkAuth, Admin.resPage);
 route.post('/info', Admin.setCategory);
-route.post('/setGood', Admin.setGood);
+route.post('/setGood', upload.single('image'), Admin.setGood);
 route.get('/getGood', checkAuth, Admin.getGood);
+route.post('/deleteGood', Admin.deleteGood);
 route.get('/goods', checkAuth, Admin.getCategory);
 
 route.post('/login', Admin.login);
 
 route.post('/register', Admin.register);
 
-route.post('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.status(200).send({message: "Logout success."});
-});
-
-route.post('/artists', checkAuth, Artist.setAr);
-route.get('/artists', Artist.getAll);
-route.get('/artists/:id', Artist.showOne);
-route.put('/artists/:id/update', Artist.actionUpdate);
-route.delete('/artists/:id/delete', Artist.actionDelete);
+// route.post('/logout', (req, res) => {
+//     res.clearCookie('token');
+//     res.status(200).send({message: "Logout success."});
+// });
+//
+// route.post('/artists', checkAuth, Artist.setAr);
+// route.get('/artists', Artist.getAll);
+// route.get('/artists/:id', Artist.showOne);
+// route.put('/artists/:id/update', Artist.actionUpdate);
+// route.delete('/artists/:id/delete', Artist.actionDelete);
 
     //routes.post(`/${config.app.botToken}`, LittleBot.BotMsg);
 

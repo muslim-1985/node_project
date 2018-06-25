@@ -9,7 +9,7 @@ const dev = {
         botToken: process.env.BOT_TOKEN,
         sslConnect: process.env.SSL_CONNECT,
         //files static path server.js include
-        staticPath: 'views',
+        staticPath: 'public',
         jwt: {
             secretOrKey: process.env.SECRET_OR_KEY
         },

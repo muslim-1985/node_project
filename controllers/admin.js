@@ -3,6 +3,7 @@ const CategoryModel = require('../models/CategoryModel');
 const GoodModel = require('../models/GoodModel');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const path = require('path');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const config = require('../config/config');
@@ -46,16 +47,18 @@ module.exports = {
       }
     },
     async setGood (req, res) {
-      let imgRoot = '/public/images';
+        let goodSave = new GoodModel;
+        goodSave.name = req.body.name;
+        goodSave.price = req.body.price;
+        goodSave.category = req.body.category;
+        goodSave.image.path = 'images/' + req.file.filename;
+        goodSave.image.contentType = req.file.mimetype;
+        goodSave.image.originalName = req.file.originalname;
       try {
-          console.log(req.body);
-          let good = await GoodModel.create({
-              name: req.body.name,
-              price: req.body.price,
-              image: fs.readFileSync(imgRoot),
-              category: req.body.category
-          });
-          res.status(200).json(good)
+          await goodSave.save();
+          console.log('save completed');
+
+          res.status(200).json('good')
       }  catch (e) {
           console.log(e);
       }
@@ -68,14 +71,22 @@ module.exports = {
           console.log(e);
       }
     },
+    async deleteGood (req, res) {
+        try{
+            fs.unlinkSync('./public/' + req.body.path);
+            let del = await GoodModel.findByIdAndRemove(req.body.id);
+            console.log(req.body.path);
+            res.send(del);
+        } catch (e) {
+            console.log(e);
+        }
+    },
     async login (req, res) {
         try {
             let user = await UsersModel.findOne({username: {$regex: _.escapeRegExp(req.body.username), $options: "i"}}).lean().exec();
             if(user != void(0) && bcrypt.compareSync(req.body.password, user.password)) {
                 const token = createToken({id: user._id, username: user.username});
-                res.cookie('token', token, {
-                    httpOnly: true
-                }).json({message: "User login success", token});
+                res.json({message: "User login success", token});
             }
              else res.status(400).send({message: "User not exist or password not correct"});
         } catch (e) {
@@ -97,9 +108,7 @@ module.exports = {
 
             const token = createToken({id: user._id, username: user.username});
 
-            res.cookie('token', token, {
-                httpOnly: true
-            }).json({message: "ok", token});
+            res.json({message: "ok", token});
 
         } catch (e) {
             console.error("E, register,", e);

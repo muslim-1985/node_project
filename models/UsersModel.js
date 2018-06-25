@@ -5,7 +5,7 @@ const bcrtypt = require('bcryptjs');
 const UsersSchema = new Schema({
     username: {type: String},
     password: {type: String},
-    email: {type: String},
+    email: {type: String, unique: true},
     addedAt: {type: Date, default: Date.now}
 }, {
     versionKey: false,
