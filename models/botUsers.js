@@ -5,6 +5,7 @@ const usersSchema = new Schema({
     lastName: String,
     username: String,
     id: Number,
+    chatId: Number,
     avatar: String,
 });
 module.exports = mongoose.model('BotUsers', usersSchema);

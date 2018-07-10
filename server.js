@@ -4,6 +4,8 @@ const exp = express();
 const app = require('http').Server(exp);
 //web socket server app
 require('./socket')(app);
+//подключение бота к серверу
+require('./controllers/LittleBot');
 //файл подключения к БД
 const db = require('./db.connect');
 //Routes file export
