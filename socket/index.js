@@ -25,34 +25,26 @@ module.exports = {
             console.log(e);
         }
     }),
-    bot: bot.on('message', async msg => {
-        const ChatId = msg.chat.id;
-        //let userAvatar = bot.getUserProfilePhotos(msg.chat.id);
-        console.log(msg.text);
-        bot.sendMessage(ChatId, JSON.stringify(msg));
-    })
+    // bot: bot.on('message', async msg => {
+    //     const ChatId = msg.chat.id;
+    //     //let userAvatar = bot.getUserProfilePhotos(msg.chat.id);
+    //     console.log(msg.text);
+    //     bot.sendMessage(ChatId, JSON.stringify(msg));
+    // })
 };
 
 
 module.exports = function(app) {
   const io = require('socket.io')(app);
     io.on('connection', function (socket) {
-        //console.log('hello');
-        // socket.emit('news', {my: 'world'});
-        // socket.on('my other event', function (data) {
-        //     console.log(data);
-        // });
-        // socket.on('SEND_MESSAGE', function(data) {
-        //     socket.emit('MESSAGE', data)
-        // });
+        console.log(socket.id);
         bot.on('message', async msg => {
             socket.emit('MESSAGE', {message: msg.text, username: msg.chat.username});
-            //let userAvatar = bot.getUserProfilePhotos(msg.chat.id);
-            //console.log(msg.text);
-            //bot.sendMessage(ChatId, JSON.stringify(msg));
         });
-        // socket.on('SEND_MESSAGE', function(data) {
-        //     bot.sendMessage(ChatId, JSON.stringify(data));
-        // })
+        socket.on('SEND_MESSAGE', async function(data) {
+            let users = await BotUsers.find({});
+            socket.emit('MESSAGE', data);
+            bot.sendMessage(users[0].chatId, JSON.stringify(data.message));
+        })
     });
 };
