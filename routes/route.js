@@ -3,8 +3,9 @@ const exp = app();
 const route = app.Router();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Artist = require('../controllers/artists');
+//const Artist = require('../controllers/artists');
 const Admin = require('../controllers/admin');
+const BotUsers = require('../controllers/botUsers');
 const multer = require('multer');
 const {checkAuth} = require('../middlewares/checkAuth');
 //промежуточная функция сохранения файла на сервере и в бд
@@ -22,7 +23,7 @@ const upload = multer({storage});
 exp.use(bodyParser.json());
 //cors enabled by libs
 exp.use(cors());
-//const LittleBot = require('../controllers/LittleBot');
+
 exp.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 route.use(bodyParser.json());
@@ -37,6 +38,7 @@ route.options('/', cors());
 route.options('/goods', cors());
 route.options('/getGood', cors());
 route.options('/deleteGood', cors());
+route.options('/botUsers', cors());
 
 route.get('/', checkAuth, Admin.resPage);
 route.post('/info', Admin.setCategory);
@@ -44,6 +46,8 @@ route.post('/setGood', upload.single('image'), Admin.setGood);
 route.get('/getGood', checkAuth, Admin.getGood);
 route.post('/deleteGood', Admin.deleteGood);
 route.get('/goods', checkAuth, Admin.getCategory);
+//botUsers controller
+route.post('/botUsers', BotUsers.getAllUsers);
 
 route.post('/login', Admin.login);
 

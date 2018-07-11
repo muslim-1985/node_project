@@ -37,14 +37,13 @@ module.exports = {
 module.exports = function(app) {
   const io = require('socket.io')(app);
     io.on('connection', function (socket) {
-        console.log(socket.id);
+        //console.log(socket.id);
         bot.on('message', async msg => {
-            socket.emit('MESSAGE', {message: msg.text, username: msg.chat.username});
+            io.to(socket.id).emit('MESSAGE', {message: msg.text, username: msg.chat.username});
         });
         socket.on('SEND_MESSAGE', async function(data) {
-            let users = await BotUsers.find({});
-            socket.emit('MESSAGE', data);
-            bot.sendMessage(users[0].chatId, JSON.stringify(data.message));
+            io.to(socket.id).emit('MESSAGE', data);
+            bot.sendMessage(data.chatId, JSON.stringify(data.message));
         })
     });
 };
