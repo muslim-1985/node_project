@@ -38,11 +38,21 @@ module.exports = function(app) {
   const io = require('socket.io')(app);
     io.on('connection', function (socket) {
         //console.log(socket.id);
-        bot.on('message', async msg => {
-            io.to(socket.id).emit('MESSAGE', {message: msg.text, username: msg.chat.username});
+        //передаем личное сообщение из телеги
+        bot.on('message', function (msg) {
+            console.log('hello world');
+            socket.join(msg.chat.id);
+            io.to(msg.chat.id).emit('MESSAGE', {message: msg.text, username: msg.chat.username});
+        });
+        socket.on('SUBSCRIBE', function(room) {
+            //в руум приходит ай ди чата телеграмм из гет запроса с фронта
+            console.log('joining room', room);
+            //создаем комнату по ай ди чата
+            socket.join(room);
         });
         socket.on('SEND_MESSAGE', async function(data) {
-            io.to(socket.id).emit('MESSAGE', data);
+            //передаем в комнату приватное сообщение котарая имее имя ай ди чата (выше мы ее создали)
+            io.to(data.chatId).emit('MESSAGE', data);
             bot.sendMessage(data.chatId, JSON.stringify(data.message));
         })
     });
