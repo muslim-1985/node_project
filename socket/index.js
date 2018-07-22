@@ -38,7 +38,7 @@ module.exports = function(app) {
   const io = require('socket.io')(app);
   //выносим функцию наружу так как long polling дублирует сообщения при нескольких коннекшнах (а такой возникает почему-то)
     bot.on('message', function (msg) {
-        io.to(msg.chat.id).emit('MESSAGE', {message: msg.text, username: msg.chat.username});
+        io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username});
     });
 
     io.on('connection', function (socket) {
