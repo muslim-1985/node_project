@@ -7,5 +7,6 @@ const usersSchema = new Schema({
     id: Number,
     chatId: Number,
     avatar: String,
+    userMessages: [{ subject: {type: String}, username: {type: String}, addedAt: {type: Date, default: Date.now}}]
 });
 module.exports = mongoose.model('BotUsers', usersSchema);

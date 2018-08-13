@@ -39,6 +39,7 @@ route.options('/goods', cors());
 route.options('/getGood', cors());
 route.options('/deleteGood', cors());
 route.options('/botUsers', cors());
+route.options('/botUsers:chatId', cors());
 
 route.get('/', checkAuth, Admin.resPage);
 route.post('/info', Admin.setCategory);
@@ -48,6 +49,7 @@ route.post('/deleteGood', Admin.deleteGood);
 route.get('/goods', checkAuth, Admin.getCategory);
 //botUsers controller
 route.post('/botUsers', BotUsers.getAllUsers);
+route.get('/userMessages/:chatId', BotUsers.getUserMessages);
 
 route.post('/login', Admin.login);
 
