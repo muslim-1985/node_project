@@ -1,35 +1,23 @@
-// process.env.NTBA_FIX_319 = 1;
-// const TelegramBot = require('node-telegram-bot-api');
-// //require config file
-// const config = require('../config/config');
-// //bot token take config file
-// const bot = new TelegramBot(config.app.botToken, {polling: true});
-// //bot.setWebHook(`${config.app.sslConnect}/${config.app.botToken}`);
-// //require model schema
-// const BotUsers = require ('../models/botUsers');
-//
-// const users = new BotUsers();
-//
-//  module.exports = {
-//     saveData: bot.onText(/\/start/, async msg => {
-//                 const ChatId = msg.chat.id;
-//                 users.firstName = msg.chat.first_name;
-//                 users.lastName = msg.chat.last_name;
-//                 users.username = msg.chat.username;
-//                 try {
-//                      await bot.sendMessage(ChatId, `Привет ${msg.chat.first_name}, я бот`);
-//                      await users.save();
-//                     console.log('user save success')
-//                 } catch(e) {
-//                     console.log(e);
-//                 }
-//     }),
-//     bot: bot.on('message', async msg => {
-//         const ChatId = msg.chat.id;
-//         //let userAvatar = bot.getUserProfilePhotos(msg.chat.id);
-//         console.log(msg.chat.first_name);
-//         bot.sendMessage(ChatId, JSON.stringify(msg));
-//     })
-// };
+const botUsers = require('../models/botUsers');
+
+module.exports = {
+    async getAllUsers (req, res) {
+        try {
+            let allUsers = await botUsers.find({});
+            res.json(allUsers);
+        } catch (e) {
+            console.log(e);
+        }
+    },
+    async deleteMessage (req, res) {
+        try {
+            let message = await botUsers.findOneAndUpdate({_id: req.body.userId}, {$pull: {userMessages: {_id: req.body.msgId}}});
+            console.log(message);
+            res.send('Сообщение успешно удалено из БД');
+        } catch (e) {
+            console.log(e);
+        }
+    }
+};
 
 

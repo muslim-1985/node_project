@@ -6,6 +6,7 @@ const cors = require('cors');
 //const Artist = require('../controllers/artists');
 const Admin = require('../controllers/admin');
 const BotUsers = require('../controllers/botUsers');
+const LittleBot = require('../controllers/LittleBot');
 const multer = require('multer');
 const {checkAuth} = require('../middlewares/checkAuth');
 //промежуточная функция сохранения файла на сервере и в бд
@@ -50,6 +51,7 @@ route.get('/goods', checkAuth, Admin.getCategory);
 //botUsers controller
 route.post('/botUsers', BotUsers.getAllUsers);
 route.get('/userMessages/:chatId', BotUsers.getUserMessages);
+route.post('/deleteMessage', LittleBot.deleteMessage);
 
 route.post('/login', Admin.login);
 
