@@ -13,27 +13,31 @@ const users = new BotUsers();
 module.exports = {
     saveData: bot.onText(/\/start/, async msg => {
         let result = await BotUsers.find({username: msg.chat.username});
-
-        if (result.length === 0) {
-            users.chatId = await msg.chat.id;
-            users.firstName = await msg.chat.first_name;
-            users.lastName = await msg.chat.last_name;
-            users.username = await msg.chat.username;
-        } else console.log('Такой пользователь уже существует');
+        // //добавляем аватар
+         let photos =  await bot.getUserProfilePhotos(msg.from.id);
+         let photo_url;
+         if(photos.photos.length > 0) {
+             let fileId =   photos.photos[0][0].file_id;
+             let file =  await bot.getFile(fileId);
+             photo_url = await `https://api.telegram.org/file/bot${config.app.botToken}/${file.file_path}`;
+             await bot.sendMessage(msg.chat.id, photo_url);
+         } else photo_url = 'ls';
         try {
-            await users.save();
+            if (result.length === 0) {
+                await BotUsers.create({
+                    chatId: msg.chat.id,
+                    firstName: msg.chat.first_name,
+                    lastName: msg.chat.last_name,
+                    username: msg.chat.username,
+                    avatar: photo_url
+                });
+             } else console.log('Такой пользователь уже существует');
             await bot.sendMessage(msg.chat.id, `Привет ${msg.chat.first_name}, я бот`);
             console.log('user save success')
         } catch(e) {
             console.log(e);
         }
-    }),
-    // bot: bot.on('message', async msg => {
-    //     const ChatId = msg.chat.id;
-    //     //let userAvatar = bot.getUserProfilePhotos(msg.chat.id);
-    //     console.log(msg.text);
-    //     bot.sendMessage(ChatId, JSON.stringify(msg));
-    // })
+    })
 };
 
 
@@ -42,8 +46,7 @@ module.exports = function(app) {
   //выносим функцию наружу так как long polling дублирует сообщения при нескольких коннекшнах (а такой возникает почему-то)
     bot.on('message', async (msg) => {
         await BotUsers.findOneAndUpdate({username: msg.chat.username}, {$push: {userMessages:{ subject: msg.text, username: msg.chat.username}}});
-        //let userAvatar = await bot.getUserProfilePhotos(msg.chat.id);
-        io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username});
+        await io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username});
     });
 
     io.on('connection', function (socket) {
