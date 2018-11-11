@@ -22,7 +22,6 @@ module.exports = {
             let users = await UsersModel.find({});
             res.status(200).json(users);
         } catch (e) {
-            console.log(e);
             res.status(500).send('Ошибка сервера');
             console.log(e)
         }

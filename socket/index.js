@@ -7,6 +7,8 @@ const bot = new TelegramBot(config.app.botToken, {polling: true});
 //bot.setWebHook(`${config.app.sslConnect}/${config.app.botToken}`);
 //require model schema
 const BotUsers = require ('../models/botUsers');
+const fetch = require('node-fetch');
+const fs = require('fs');
 
 const users = new BotUsers();
 
@@ -14,14 +16,31 @@ module.exports = {
     saveData: bot.onText(/\/start/, async msg => {
         let result = await BotUsers.find({username: msg.chat.username});
         // //добавляем аватар
-         let photos =  await bot.getUserProfilePhotos(msg.from.id);
-         let photo_url;
-         if(photos.photos.length > 0) {
-             let fileId =   photos.photos[0][0].file_id;
-             let file =  await bot.getFile(fileId);
-             photo_url = await `https://api.telegram.org/file/bot${config.app.botToken}/${file.file_path}`;
-             await bot.sendMessage(msg.chat.id, photo_url);
-         } else photo_url = 'ls';
+        let photos =  await bot.getUserProfilePhotos(msg.from.id);
+        let fileId = photos.photos[0][0].file_id;
+        let file = await bot.getFile(fileId);
+        let photo_url = `https://api.telegram.org/file/bot${config.app.botToken}/${file.file_path}`;
+        let avatarPath = `./public/avatars/${fileId}.jpg`;
+        let staticPath = `avatars/${fileId}.jpg`;
+        if(photos.photos.length > 0) {
+            fetch(photo_url)
+                .then(res => {
+                    return new Promise((resolve, reject) => {
+                        const dest = fs.createWriteStream(avatarPath);
+                        res.body.pipe(dest);
+                        res.body.on('error', err => {
+                            reject(err);
+                        });
+                        dest.on('finish', () => {
+                            resolve();
+                        });
+                        dest.on('error', err => {
+                            reject(err);
+                        });
+                    });
+                });
+        }
+
         try {
             if (result.length === 0) {
                 await BotUsers.create({
@@ -29,7 +48,7 @@ module.exports = {
                     firstName: msg.chat.first_name,
                     lastName: msg.chat.last_name,
                     username: msg.chat.username,
-                    avatar: photo_url
+                    avatar: staticPath
                 });
              } else console.log('Такой пользователь уже существует');
             await bot.sendMessage(msg.chat.id, `Привет ${msg.chat.first_name}, я бот`);
@@ -43,6 +62,7 @@ module.exports = {
 
 module.exports = function(app) {
   const io = require('socket.io')(app);
+
   //выносим функцию наружу так как long polling дублирует сообщения при нескольких коннекшнах (а такой возникает почему-то)
     bot.on('message', async (msg) => {
         await BotUsers.findOneAndUpdate({username: msg.chat.username}, {$push: {userMessages:{ subject: msg.text, username: msg.chat.username}}});

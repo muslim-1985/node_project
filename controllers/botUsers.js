@@ -12,7 +12,6 @@ module.exports = {
     async getUserMessages (req, res) {
         try {
             let userMessages = await botUsers.findOne({chatId: req.params.chatId});
-            console.log(userMessages);
             res.json(userMessages);
         } catch (e) {
             console.log(e)
