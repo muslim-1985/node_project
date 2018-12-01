@@ -74,10 +74,21 @@ module.exports = {
         try{
             fs.unlinkSync('./public/' + req.body.path);
             let del = await GoodModel.findByIdAndRemove(req.body.id);
-            console.log(req.body.path);
+            //console.log(req.body.path);
             res.send(del);
         } catch (e) {
             console.log(e);
+        }
+    },
+    async getUserAdminMessages (req, res) {
+        try {
+            let userMessages = await UsersModel.findOne({chatId: req.params.chatId});
+            //записываем айдишник чата в сессию
+            //req.session.chatId = req.params.chatId;
+            //console.log(req.user.id)
+            res.json(userMessages);
+        } catch (e) {
+            console.log(e)
         }
     },
     async login (req, res) {

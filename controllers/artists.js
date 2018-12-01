@@ -30,7 +30,7 @@ module.exports = {
     async actionUpdate (req, res) {
         try {
             let update = await Artists.findByIdAndUpdate(req.params.id,{name: req.body.name});
-            console.log(update);
+            //console.log(update);
             res.send(update);
         } catch (e) {
             console.log(e);

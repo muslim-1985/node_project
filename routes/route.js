@@ -8,7 +8,7 @@ const Admin = require('../controllers/admin');
 const BotUsers = require('../controllers/botUsers');
 const LittleBot = require('../controllers/LittleBot');
 const multer = require('multer');
-const {checkAuth} = require('../middlewares/checkAuth');
+const {checkAuth} = require('../http/middlewares/checkAuth');
 //промежуточная функция сохранения файла на сервере и в бд
 const storage = multer.diskStorage({
     destination (req, file, cb) {
@@ -31,7 +31,8 @@ route.use(bodyParser.json());
 //enabled CORS
 route.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
+    res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS");
     next();
 });
 
@@ -43,15 +44,16 @@ route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
 
 route.get('/', checkAuth, Admin.resPage);
-route.post('/info', Admin.setCategory);
-route.post('/setGood', upload.single('image'), Admin.setGood);
+route.post('/info', checkAuth, Admin.setCategory);
+route.post('/setGood', checkAuth, upload.single('image'), Admin.setGood);
 route.get('/getGood', checkAuth, Admin.getGood);
-route.post('/deleteGood', Admin.deleteGood);
+route.post('/deleteGood', checkAuth, Admin.deleteGood);
 route.get('/goods', checkAuth, Admin.getCategory);
 //botUsers controller
-route.post('/botUsers', BotUsers.getAllUsers);
-route.get('/userMessages/:chatId', BotUsers.getUserMessages);
-route.post('/deleteMessage', LittleBot.deleteMessage);
+route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
+route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
+route.get('/userAdminMessages/:chatId', checkAuth, Admin.getUserAdminMessages);
+route.post('/deleteMessage', checkAuth, LittleBot.deleteMessage);
 
 route.post('/login', Admin.login);
 

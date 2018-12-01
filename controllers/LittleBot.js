@@ -11,8 +11,7 @@ module.exports = {
     },
     async deleteMessage (req, res) {
         try {
-            let message = await botUsers.findOneAndUpdate({_id: req.body.userId}, {$pull: {userMessages: {_id: req.body.msgId}}});
-            console.log(message);
+            await botUsers.findOneAndUpdate({_id: req.body.userId}, {$pull: {userMessages: {_id: req.body.msgId}}});
             res.send('Сообщение успешно удалено из БД');
         } catch (e) {
             console.log(e);

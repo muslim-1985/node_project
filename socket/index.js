@@ -4,13 +4,14 @@ const TelegramBot = require('node-telegram-bot-api');
 const config = require('../config/config');
 //bot token take config file
 const bot = new TelegramBot(config.app.botToken, {polling: true});
+const jwt = require('jsonwebtoken');
 //bot.setWebHook(`${config.app.sslConnect}/${config.app.botToken}`);
 //require model schema
 const BotUsers = require ('../models/botUsers');
+const Users = require('../models/UsersModel');
+const cookie = require('cookie');
 const fetch = require('node-fetch');
 const fs = require('fs');
-
-const users = new BotUsers();
 
 module.exports = {
     saveData: bot.onText(/\/start/, async msg => {
@@ -72,12 +73,23 @@ module.exports = function(app) {
     io.on('connection', function (socket) {
         //передаем личное сообщение из телеги
         socket.on('SUBSCRIBE', function(room) {
+            // let cookie_string = socket.request.headers.cookie;
+            // let cookies = cookie.parse(cookie_string);
+            //console.log(cookies["connect.sid"]);
             //в room приходит ай ди чата телеграмм из гет запроса с фронта
             //создаем комнату по ай ди чата
             socket.join(room);
         });
         socket.on('SEND_MESSAGE', async function (data) {
-            await BotUsers.findOneAndUpdate({chatId: data.chatId}, {$push: {userMessages:{ subject: data.message}}});
+            //await BotUsers.findOneAndUpdate({chatId: data.chatId}, {$push: {userMessages:{ subject: data.message}}});
+            try {
+                //let user = await Users.findOne({_id: data.userId});
+                // let cookie_string = socket.request.headers
+                // console.log(cookie_string)
+                await BotUsers.findOneAndUpdate({chatId: data.chatId}, {$push: {userMessages:{ subject: data.message}}});
+            } catch (e) {
+                console.log(e)
+            }
             //передаем в комнату приватное сообщение котарая имее имя ай ди чата (выше мы ее создали)
             io.to(data.chatId).emit('MESSAGE', data);
             bot.sendMessage(data.chatId, JSON.stringify(data.message));
