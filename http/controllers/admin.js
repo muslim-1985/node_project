@@ -1,12 +1,12 @@
-const UsersModel = require('../models/UsersModel');
-const CategoryModel = require('../models/CategoryModel');
-const GoodModel = require('../models/GoodModel');
+const UsersModel = require('../../models/UsersModel');
+const CategoryModel = require('../../models/CategoryModel');
+const GoodModel = require('../../models/GoodModel');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
-const config = require('../config/config');
+const config = require('../../config/config');
 
 function createToken (body) {
     return jwt.sign(
@@ -83,9 +83,6 @@ module.exports = {
     async getUserAdminMessages (req, res) {
         try {
             let userMessages = await UsersModel.findOne({chatId: req.params.chatId});
-            //записываем айдишник чата в сессию
-            //req.session.chatId = req.params.chatId;
-            //console.log(req.user.id)
             res.json(userMessages);
         } catch (e) {
             console.log(e)

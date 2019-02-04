@@ -1,4 +1,4 @@
-const botUsers = require('../models/botUsers');
+const botUsers = require('../../models/botUsers');
 
 module.exports = {
     async getAllUsers (req, res) {

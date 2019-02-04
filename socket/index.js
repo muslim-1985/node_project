@@ -50,7 +50,7 @@ module.exports = function(app) {
   //выносим функцию наружу так как long polling дублирует сообщения при нескольких коннекшнах (а такой возникает почему-то)
     bot.on('message', async (msg) => {
         await BotUsers.findOneAndUpdate({username: msg.chat.username}, {$push: {userMessages:{ subject: msg.text, username: msg.chat.username, id: msg.chat.id}}});
-        await io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username});
+        await io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username, id: msg.chat.id});
     });
 
     io.on('connection', function (socket) {
