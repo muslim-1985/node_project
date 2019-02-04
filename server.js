@@ -37,13 +37,13 @@ exp.use('/', routes);
 //инициализируем авторизацию из подключенного модуля
 initPassportAuth();
 
-db.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, async (err) => {
+db.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, (err) => {
 		if(err) {
 			console.log(err);
 		}
 		console.log('database connected');
 
-	    app.listen(config.app.port, async () => {
+	    app.listen(config.app.port, () => {
 		console.log('app started muslim bey');
 	})
 });
