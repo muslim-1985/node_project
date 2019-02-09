@@ -5,8 +5,4 @@ module.exports = async function filesPipe(fileUrl, filePath) {
     let result = await fetch (fileUrl);
     const dest = fs.createWriteStream(filePath);
     result.body.pipe(dest);
-    result.on('error', function(err) {
-        console.log(err);
-        result.end();
-    });
 }

@@ -16,14 +16,17 @@ module.exports = {
         let result = await BotUsers.find({username: msg.chat.username});
         // //добавляем аватар
         let photos =  await bot.getUserProfilePhotos(msg.from.id);
-        let fileId = photos.photos[0][0].file_id;
-        let file = await bot.getFile(fileId);
-        let photoUrl = `https://api.telegram.org/file/bot${config.app.botToken}/${file.file_path}`;
-        let avatarPath = `./public/avatars/${fileId}.jpg`;
-        let staticPath = `avatars/${fileId}.jpg`;
-        if(photos.photos.length > 0) {
-            fetchFile (photoUrl, avatarPath);
-        }
+        let staticPath = 'not-found';
+        if (typeof photos.photos[0] !== 'undefined') {
+            let fileId = photos.photos[0][0].file_id;
+            let file = await bot.getFile(fileId);
+            let photoUrl = `https://api.telegram.org/file/bot${config.app.botToken}/${file.file_path}`;
+            let avatarPath = `./public/avatars/${fileId}.jpg`;
+            staticPath = `avatars/${fileId}.jpg`;
+            if(photos.photos.length > 0) {
+                fetchFile (photoUrl, avatarPath);
+            }
+        } 
 
         try {
             if (result.length === 0) {
@@ -50,17 +53,12 @@ module.exports = function(app) {
   //выносим функцию наружу так как long polling дублирует сообщения при нескольких коннекшнах (а такой возникает почему-то)
     bot.on('message', async (msg) => {
         await BotUsers.findOneAndUpdate({username: msg.chat.username}, {$push: {userMessages:{ subject: msg.text, username: msg.chat.username, id: msg.chat.id}}});
-        await io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username, id: msg.chat.id});
+        await io.to(msg.chat.id).emit('MESSAGE_BOT_USER', {message: msg.text, username: msg.chat.username, chatId: msg.chat.id});
     });
 
     io.on('connection', function (socket) {
         //передаем личное сообщение из телеги
         socket.on('SUBSCRIBE', function(room) {
-            // let cookie_string = socket.request.headers.cookie;
-            // let cookies = cookie.parse(cookie_string);
-            //console.log(cookies["connect.sid"]);
-            //в room приходит ай ди чата телеграмм из гет запроса с фронта
-            //создаем комнату по ай ди чата
             socket.join(room);
         });
         socket.on('SEND_MESSAGE', async function (data) {
