@@ -10,6 +10,7 @@ const dev = {
         sslConnect: process.env.SSL_CONNECT,
         //files static path server.js include
         staticPath: 'public',
+        url: 'https://cfa0f8ac.ngrok.io/',
         jwt: {
             secretOrKey: process.env.SECRET_OR_KEY
         },

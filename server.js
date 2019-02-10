@@ -3,7 +3,8 @@ const exp = express();
 //http server app
 const app = require('http').Server(exp);
 //web socket server app
-require('./socket')(app);
+const io = require('socket.io')(app);
+require('./socket')(io);
 //файл подключения к БД
 const db = require('./db.connect');
 //Routes file export
