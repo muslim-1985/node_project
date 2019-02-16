@@ -44,6 +44,8 @@ bot.onText(/\/start/, async msg => {
     });
 
 
-module.exports = function(io) {
-   botRealtime(io, bot);
+module.exports = async function(io) {
+   let realTime = await new botRealtime(io, bot);
+   await realTime.botOnMessage();
+   await realTime.onConnection();
 };
