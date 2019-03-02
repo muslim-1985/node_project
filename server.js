@@ -4,7 +4,10 @@ const exp = express();
 const app = require('http').Server(exp);
 //web socket server app
 const io = require('socket.io')(app);
-require('./socket')(io);
+require('./socket/index')(io);
+const Redis = require('ioredis');
+const redis = new Redis();
+require('./socket/workers_subscribers/apache_log_sub')(redis, io);
 //файл подключения к БД
 const db = require('./db.connect');
 //Routes file export
@@ -15,7 +18,7 @@ const config = require('./config/config');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const {initPassportAuth} = require('./http/middlewares/checkAuth');
-
+require('./http/workers/getLogsFromRemoteServer')();
 
 //static file path
 exp.use(express.static(config.app.staticPath));

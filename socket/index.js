@@ -7,8 +7,9 @@ const fetchFile = require('../http/helpers/filesPipe');
 const bot = new TelegramBot(config.app.botToken, {polling: true});
 //bot.setWebHook(config.app.url);
 const jwt = require('jsonwebtoken');
-const botRealtime = require('./socket');
+const botRealtime = require('./controllers/telegramm_socket');
 const Users = require('../models/UsersModel');
+const BotUsers = require ('../models/botUsers');
 
 bot.onText(/\/start/, async msg => {
         let result = await BotUsers.find({username: msg.chat.username});
@@ -47,5 +48,5 @@ bot.onText(/\/start/, async msg => {
 module.exports = async function(io) {
    let realTime = await new botRealtime(io, bot);
    await realTime.botOnMessage();
-   await realTime.onConnection();
+   await realTime.botOnConnection();
 };

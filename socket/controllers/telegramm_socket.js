@@ -1,6 +1,6 @@
 
-const BotUsers = require ('../models/botUsers');
-const Socket = require ('./socket_extend')
+const BotUsers = require ('../../models/botUsers');
+const Socket = require ('../socket_extend')
 
 module.exports = class BotRealtime extends Socket {
     constructor (io, bot) {
@@ -11,10 +11,10 @@ module.exports = class BotRealtime extends Socket {
     botOnMessage () {
         this.bot.on('message', async msg => {super.botOnMessage(msg)})
     }
-    onConnection () {
+    botOnConnection () {
         this.io.on('connection', async socket => {
             socket.on('SEND_MESSAGE', async data => {
-                super.botOnConnection(data);
+                super.botOnGetMessage(data);
             })
         })
     }

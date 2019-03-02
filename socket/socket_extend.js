@@ -10,14 +10,15 @@ module.exports = class Socket {
                 subject: message.text, 
                 username: message.chat.username, 
                 id: message.chat.id
-            }}});
+            }
+        }});
         await this.io.emit('MESSAGE_BOT_USER', {
             message: message.text, 
             username: message.chat.username, 
             chatId: message.chat.id
         });
     }
-    async botOnConnection (data) {
+    async botOnGetMessage (data) {
         try {
             await this.model.findOneAndUpdate({chatId: data.chatId}, {$push: {userMessages:{ subject: data.message, username: data.username}}});
         } catch (e) {
