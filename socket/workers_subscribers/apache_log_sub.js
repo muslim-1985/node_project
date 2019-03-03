@@ -7,7 +7,7 @@ module.exports = async function(redis, io) {
     
     redis.on('message', (channel, message) => {
         nsp.emit('log', message);
-        console.log(`Received the following message from ${channel}: ${message}`);
+       // console.log(`Received the following message from ${channel}: ${message}`);
     });
     
     const channel = 'logData';
