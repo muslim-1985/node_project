@@ -2,7 +2,7 @@
 module.exports = async function(redis, io) {
     let nsp = io.of('/log');
     nsp.on('connection', function(socket){
-    console.log('someone connected');
+        console.log('someone connected');
     });
     
     redis.on('message', (channel, message) => {

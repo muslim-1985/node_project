@@ -93,7 +93,7 @@ module.exports = {
             let user = await UsersModel.findOne({username: {$regex: _.escapeRegExp(req.body.username), $options: "i"}}).lean().exec();
             if(user != void(0) && bcrypt.compareSync(req.body.password, user.password)) {
                 const token = createToken({id: user._id, username: user.username});
-                res.json({message: "User login success", token});
+                res.json({message: "User login success", userId: user._id, token});
             }
              else res.status(400).send({message: "User not exist or password not correct"});
         } catch (e) {
@@ -115,7 +115,7 @@ module.exports = {
 
             const token = createToken({id: user._id, username: user.username});
 
-            res.json({message: "ok", token});
+            res.json({message: "ok", userId: user._id, token});
 
         } catch (e) {
             console.error("E, register,", e);

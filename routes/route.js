@@ -9,6 +9,7 @@ const BotUsers = require('../http/controllers/botUsers');
 const LittleBot = require('../http/controllers/LittleBot');
 const multer = require('multer');
 const {checkAuth} = require('../http/middlewares/checkAuth');
+const log = require('../http/workers/controllers/push_data_proccess');
 //промежуточная функция сохранения файла на сервере и в бд
 const storage = multer.diskStorage({
     destination (req, file, cb) {
@@ -42,6 +43,8 @@ route.options('/getGood', cors());
 route.options('/deleteGood', cors());
 route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
+route.options('/apacheLogs:userId', cors());
+route.options('/setLogs', cors());
 
 route.get('/', checkAuth, Admin.resPage);
 route.post('/info', checkAuth, Admin.setCategory);
@@ -54,6 +57,9 @@ route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
 route.get('/userAdminMessages/:chatId', checkAuth, Admin.getUserAdminMessages);
 route.post('/deleteMessage', checkAuth, LittleBot.deleteMessage);
+//workers
+route.get('/apacheLogs/:userId', checkAuth, log.getUser);
+route.post('/setLogs', checkAuth, log.setLogs);
 
 route.post('/login', Admin.login);
 

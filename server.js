@@ -18,7 +18,9 @@ const config = require('./config/config');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const {initPassportAuth} = require('./http/middlewares/checkAuth');
-require('./http/workers/getLogsFromRemoteServer')();
+
+const { fork } = require('child_process');
+fork('./http/workers/getLogsFromRemoteServer');
 
 //static file path
 exp.use(express.static(config.app.staticPath));
@@ -42,12 +44,12 @@ exp.use('/', routes);
 initPassportAuth();
 
 db.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, (err) => {
-		if(err) {
-			console.log(err);
-		}
-		console.log('database connected');
+    if (err) {
+        console.log(err);
+    }
+    console.log('database connected');
 
-	    app.listen(config.app.port, () => {
-		console.log('app started muslim bey');
-	})
+    app.listen(config.app.port, () => {
+        console.log('app started muslim bey');
+    })
 });
