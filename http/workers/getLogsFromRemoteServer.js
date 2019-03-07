@@ -3,22 +3,25 @@ const fs = require('fs');
 const Redis = require('ioredis');
 const db = require('../../db.connect');
 const config = require('../../config/config');
-const botUsers = require('../../models/botUsers');
 const {getLog} = require('./controllers/apache_log')
 
 let ssh = new node_ssh();
-const pub = new Redis();
+const sub = new Redis();
 const channel = 'logData';
 let messages = [];
 const chan = 'userID';
 
 module.exports = async function () {
-    pub.on('message', async (channel, message) => {
+    fs.appendFile(`./log_ssh/error.log`, 'Hello content!', function (err) {
+        if (err) throw err;
+        console.log('Saved!');
+    });
+    sub.on('message', async (channel, message) => {
         messages.push(message);
         console.log(`Received the following message from ${channel}: ${message}`);
     });
 
-    pub.subscribe(chan, (error, count) => {
+    sub.subscribe(chan, (error, count) => {
         if (error) {
             throw new Error(error);
         }
@@ -31,12 +34,12 @@ module.exports = async function () {
         console.log('database connected from child process');
 
     });
-    let allUsers = await botUsers.find({});
+    console.log(messages)
     /*
      set data structure contains only unique elements,
      and therefore it is impossible to write the same data
     **/
     let logFileSize = new Set();
     let logState = false;
-    setInterval(() => getLog(logState, logFileSize, fs, ssh, pub, channel), 60000);
+    setInterval(() => getLog(logState, logFileSize, fs, ssh, channel, messages), 15000);
 }();
