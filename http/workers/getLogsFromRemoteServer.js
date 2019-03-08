@@ -3,9 +3,8 @@ const fs = require('fs');
 const Redis = require('ioredis');
 const db = require('../../db.connect');
 const config = require('../../config/config');
-const {getLog} = require('./controllers/apache_log')
+const LogProcess = require('./controllers/apache_log')
 
-let ssh = new node_ssh();
 const sub = new Redis();
 const channel = 'logData';
 let messages = [];
@@ -34,12 +33,7 @@ module.exports = async function () {
         console.log('database connected from child process');
 
     });
-    console.log(messages)
-    /*
-     set data structure contains only unique elements,
-     and therefore it is impossible to write the same data
-    **/
-    let logFileSize = new Set();
-    let logState = false;
-    setInterval(() => getLog(logState, logFileSize, fs, ssh, channel, messages), 15000);
+    console.log(messages[0])
+    const logProcess = new LogProcess(channel);
+    setInterval(() => logProcess.getLog(messages), 15000);
 }();
