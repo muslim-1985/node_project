@@ -1,13 +1,14 @@
-const node_ssh = require('node-ssh');
+
 const fs = require('fs');
 const Redis = require('ioredis');
 const db = require('../../db.connect');
 const config = require('../../config/config');
 const LogProcess = require('./controllers/apache_log')
+const redis = require("async-redis");
+const client = redis.createClient();
 
 const sub = new Redis();
 const channel = 'logData';
-let messages = [];
 const chan = 'userID';
 
 module.exports = async function () {
@@ -16,7 +17,11 @@ module.exports = async function () {
         console.log('Saved!');
     });
     sub.on('message', async (channel, message) => {
-        messages.push(message);
+        try {
+            await client.set('mess', message);
+        } catch (e) {
+            console.log(e)
+        }
         console.log(`Received the following message from ${channel}: ${message}`);
     });
 
@@ -33,7 +38,9 @@ module.exports = async function () {
         console.log('database connected from child process');
 
     });
-    console.log(messages[0])
+    
     const logProcess = new LogProcess(channel);
-    setInterval(() => logProcess.getLog(messages), 15000);
-}();
+
+    setInterval(() => logProcess.getLog(client), 15000);
+
+    }();
