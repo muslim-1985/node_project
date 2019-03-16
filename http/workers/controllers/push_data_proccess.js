@@ -3,11 +3,17 @@ const Redis = require('ioredis');
 const pub = new Redis();
 const UsersModel = require('../../../models/UsersModel');
 const channel = 'userID';
-let userIdState;
+let user;
 module.exports = {
     async getUser(req, res) {
-        userIdState = req.params.userId;
-        await pub.publish(channel, userIdState);
+        try {
+            user = await UsersModel.findOneAndUpdate({_id: req.body.userId}, {$set: {watch: req.body.watch}}, {new: true});
+        } catch (e) {
+            console.log(e)
+        }
+       // console.log(user.watch)
+       let obj = await JSON.stringify(user);
+       await pub.publish(channel, obj);
     },
     async setLogs(req, res) {
         try {

@@ -22,7 +22,7 @@ module.exports = async function () {
         } catch (e) {
             console.log(e)
         }
-        console.log(`Received the following message from ${channel}: ${message}`);
+       // console.log(`Received the following message from ${channel}: ${message}`);
     });
 
     sub.subscribe(chan, (error, count) => {

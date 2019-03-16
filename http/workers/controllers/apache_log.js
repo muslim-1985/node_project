@@ -1,24 +1,21 @@
-
 const UsersModel = require('../../../models/UsersModel');
 const Log = require('./log');
 module.exports = class LogProcess extends Log {
-    constructor (channel) {
+    constructor(channel) {
         super(channel);
-        this.user = false;
         this.message = 0;
+        this.users = 0;
     }
-    async getLog (client) {
+    async getLog(client) {
         try {
-            this.message = await client.get('mess');
-            console.log(this.message)
+            let obj = await client.get('mess');
+            this.message = await JSON.parse(obj)
         } catch (e) {
             console.log(e)
         }
         if (this.message != 0 && typeof this.message !== 'undefined') {
             try {
-                this.user = await UsersModel.findOne({
-                    _id: this.message
-                });
+                this.users = await UsersModel.find({});
             } catch (e) {
                 console.log(e)
             }
@@ -26,23 +23,42 @@ module.exports = class LogProcess extends Log {
             console.log('server is not tracked')
             return;
         }
-        
-        if (this.user && typeof this.user.servers[0] !== 'undefined') {
-            this.user.servers.map(async server => {
-                try {
-                    let {ip, username, privateKey, passpharse} = server;
-                    await this.sshConnect({ip, username, privateKey, passpharse});
-                    try {
-                        await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log')
-                    } catch(e) {
-                        console.log(e)
-                    }
-                } catch (e) {
-                    console.log(e)
+        console.log(this.message.watch)
+
+        if (this.users != 0) {
+            let filterUsers = await this.users.filter(user => {
+                if (user.servers[0] !== 'undefined' && user.watch) {
+                    return user;
                 }
             })
-        } else {
-            console.log('server not found')
+            //console.log(filterUsers)
+
+            for (let user of filterUsers) {
+                user.servers.map(async server => {
+                    try {
+                        let {
+                            ip,
+                            username,
+                            privateKey,
+                            passpharse
+                        } = server;
+                        await this.sshConnect({
+                            ip,
+                            username,
+                            privateKey,
+                            passpharse
+                        });
+                        try {
+                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user._id)
+                        } catch (e) {
+                            console.log(e)
+                        }
+                    } catch (e) {
+                        console.log(e)
+                    }
+                })
+            }
         }
+
     }
 }

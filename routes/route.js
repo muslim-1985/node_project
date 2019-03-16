@@ -43,7 +43,7 @@ route.options('/getGood', cors());
 route.options('/deleteGood', cors());
 route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
-route.options('/apacheLogs:userId', cors());
+route.options('/apacheLogs', cors());
 route.options('/setLogs', cors());
 
 route.get('/', checkAuth, Admin.resPage);
@@ -58,7 +58,7 @@ route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
 route.get('/userAdminMessages/:chatId', checkAuth, Admin.getUserAdminMessages);
 route.post('/deleteMessage', checkAuth, LittleBot.deleteMessage);
 //workers
-route.get('/apacheLogs/:userId', checkAuth, log.getUser);
+route.post('/apacheLogs', checkAuth, log.getUser);
 route.post('/setLogs', checkAuth, log.setLogs);
 
 route.post('/login', Admin.login);

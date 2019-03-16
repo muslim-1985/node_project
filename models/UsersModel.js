@@ -10,6 +10,7 @@ const UsersSchema = new Schema({
     email: {type: String, unique: true},
     addedAt: {type: Date, default: Date.now},
     avatar: String,
+    watch: Boolean,
     servers: [{username: {type: String}, key: {type: String}, passpharse: {type: String}, ip: {type: String}, logs: [{subject: {type: String}, addedAt: {type: Date, default: Date.now}}]} ],
     botUsers: {
         type: mongoose.Schema.Types.ObjectId,
