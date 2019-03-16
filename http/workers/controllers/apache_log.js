@@ -1,3 +1,4 @@
+const fs = require('fs');
 const UsersModel = require('../../../models/UsersModel');
 const Log = require('./log');
 module.exports = class LogProcess extends Log {
@@ -31,10 +32,59 @@ module.exports = class LogProcess extends Log {
                     return user;
                 }
             })
-            //console.log(filterUsers)
 
             for (let user of filterUsers) {
+
+                await fs.stat(`./log_ssh/${user._id}`, function (err, stats) {
+                    if (!err) {
+                        console.log('file or directory exists');
+                        return
+                    }
+                    //Check if error defined and the error code is "not exists"
+
+                    if (err.code === 'ENOENT') {
+                        fs.mkdir(`./log_ssh/${user._id}`, {
+                            recursive: true
+                        }, (err) => {
+                            if (err) throw err;
+                        });
+                    }
+
+                });
+
                 user.servers.map(async server => {
+                    
+                    await fs.stat(`./log_ssh/${user._id}/${server._id}`, function (err, stats) {
+                        if (!err) {
+                            console.log('file or directory exists');
+                            return
+                        }
+                        //Check if error defined and the error code is "not exists"
+
+                        if (err.code === 'ENOENT') {
+                            fs.mkdir(`./log_ssh/${user._id}/${server._id}`, {
+                                recursive: true
+                            }, (err) => {
+                                if (err) throw err;
+                            });
+                        }
+
+                    });
+
+                    await fs.stat(`./log_ssh/${user._id}/${server._id}/error.log`, function(err, stat) {
+                        if(err == null) {
+                            console.log('File exists');
+                        } else if(err.code === 'ENOENT') {
+                            // file does not exist
+                            fs.appendFile(`./log_ssh/${user._id}/${server._id}/error.log`, 'Hello content!', function (err) {
+                                if (err) throw err;
+                                console.log('Saved!');
+                            });
+                        } else {
+                            console.log('Some other error: ', err.code);
+                        }
+                    });
+
                     try {
                         let {
                             ip,
@@ -49,7 +99,7 @@ module.exports = class LogProcess extends Log {
                             passpharse
                         });
                         try {
-                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user._id)
+                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user._id, server._id)
                         } catch (e) {
                             console.log(e)
                         }
