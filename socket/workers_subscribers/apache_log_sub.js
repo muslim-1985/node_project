@@ -25,11 +25,6 @@ module.exports = async function(redis, io) {
         console.log('someone connected');
     });
     
-    // redis.on('message', (channel, message) => {
-    //     nsp.emit('log', message);
-    //    // console.log(`Received the following message from ${channel}: ${message}`);
-    // });
-    
     const channel = 'logData';
     
     redis.subscribe(channel, (error, count) => {
