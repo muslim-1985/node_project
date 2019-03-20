@@ -37,7 +37,7 @@ module.exports = class Log {
            agent: process.env.SSH_AUTH_SOCK
        })
    }
-   async execRemoteServer(cwdFilePath, filePath, logFile, userId, serverId) {
+   async execRemoteServer(cwdFilePath, filePath, logFile, userId, serverId, sharedServersUsers) {
        try {
            //check change error.log file size from remote server
            let exec = await ssh.execCommand(`wc -c < ${logFile}`, {
@@ -57,7 +57,7 @@ module.exports = class Log {
            }
            console.log(this.logFileSize.size)
 
-           this._publishFileData(logFile, filePath, userId, serverId);
+           await this._publishFileData(logFile, filePath, userId, serverId, sharedServersUsers);
        } catch (e) {
            console.log('STDERR: ' + exec.stderr)
        }
@@ -65,8 +65,17 @@ module.exports = class Log {
    /*
     private method
    */
-   async _publishFileData(logFile, filePath, userId, serverId) {
+   async _publishFileData(logFile, filePath, userId, serverId, sharedServersUsers) {
        if (this.logState) {
+
+            // if(sharedServersUsers.length > 0) {
+            //     for (let users of sharedServersUsers) {
+            //         for(let id of sharedServersUsers.users_id) {
+
+            //         }
+            //     }
+            // }
+
            try {
                this.logState = false;
                await this.ssh.getFile(`./log_ssh/${userId}/${serverId}/${logFile}`, filePath);
