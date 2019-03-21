@@ -1,4 +1,4 @@
-const fs = require('fs');
+
 const UsersModel = require('../../../models/UsersModel');
 const Log = require('./log');
 module.exports = class LogProcess extends Log {
@@ -37,7 +37,7 @@ module.exports = class LogProcess extends Log {
                     "count": -1
                 }
             }]);
-            console.log(this.sharedServersUsers[0].users_id);
+            console.log(this.sharedServersUsers);
         } catch (e) {
             console.log(e)
         }
