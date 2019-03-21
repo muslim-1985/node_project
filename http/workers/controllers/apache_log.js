@@ -1,5 +1,5 @@
 
-//const UsersModel = require('../../../models/UsersModel');
+const {User, UserServers} = require('../../../sequalize');
 const Log = require('./log');
 module.exports = class LogProcess extends Log {
     constructor(channel) {
@@ -10,7 +10,10 @@ module.exports = class LogProcess extends Log {
     async getLog() {
 
         try {
-            // this.users = await UsersModel.find({watch:true, servers:{$exists: true, $not: {$size: 0}}});
+             this.users = await User.findAll({include: [UserServers], where:{watch:true}});
+                for (let us of this.users) {
+                    console.log(us.watch)
+                }
             // this.sharedServersUsers = await UsersModel.aggregate([{
     
             //     //group by and count the same servers by users
@@ -37,7 +40,7 @@ module.exports = class LogProcess extends Log {
             //         "count": -1
             //     }
             // }]);
-            console.log(this.sharedServersUsers);
+          //  console.log(this.sharedServersUsers);
         } catch (e) {
             console.log(e)
         }
@@ -45,8 +48,8 @@ module.exports = class LogProcess extends Log {
          if(this.users.length > 0) {
             for (let user of this.users) {
 
-                user.servers.map(async server => {
-
+                user.user_servers.map(async server => {
+                    console.log(server.id)
                     try {
                         let {
                             ip,
@@ -62,7 +65,7 @@ module.exports = class LogProcess extends Log {
                         });
                         try {
                             let self = this;
-                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user._id, server._id, self.sharedServersUsers)
+                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user.id, server.id, self.sharedServersUsers)
                         } catch (e) {
                             console.log(e)
                         }

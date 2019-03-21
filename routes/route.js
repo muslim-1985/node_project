@@ -6,7 +6,6 @@ const cors = require('cors');
 //const Artist = require('../controllers/artists');
 const Admin = require('../http/controllers/admin');
 const BotUsers = require('../http/controllers/botUsers');
-//const LittleBot = require('../http/controllers/LittleBot');
 const multer = require('multer');
 const {checkAuth} = require('../http/middlewares/checkAuth');
 const log = require('../http/workers/controllers/push_data_proccess');
@@ -47,7 +46,6 @@ route.get('/', checkAuth, Admin.resPage);
 //botUsers controller
 route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
-//route.post('/deleteMessage', checkAuth, LittleBot.deleteMessage);
 //workers
 route.post('/apacheLogs', checkAuth, log.getUser);
 route.post('/setLogs', checkAuth, log.setLogs);

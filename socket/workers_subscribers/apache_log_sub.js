@@ -14,6 +14,7 @@ module.exports = async function(redis, io) {
                     console.log(e)
                 }
                 let mes = await JSON.stringify(result.fileData);
+                console.log(mes)
                 await nsp.to(result.userId).emit('log', mes);
                // console.log(`Received the following message from ${channel}: ${message}`);
             });
