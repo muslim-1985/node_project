@@ -1,5 +1,5 @@
 
-const UsersModel = require('../../../models/UsersModel');
+//const UsersModel = require('../../../models/UsersModel');
 const Log = require('./log');
 module.exports = class LogProcess extends Log {
     constructor(channel) {
@@ -10,33 +10,33 @@ module.exports = class LogProcess extends Log {
     async getLog() {
 
         try {
-            this.users = await UsersModel.find({watch:true, servers:{$exists: true, $not: {$size: 0}}});
-            this.sharedServersUsers = await UsersModel.aggregate([{
+            // this.users = await UsersModel.find({watch:true, servers:{$exists: true, $not: {$size: 0}}});
+            // this.sharedServersUsers = await UsersModel.aggregate([{
     
-                //group by and count the same servers by users
-                "$group": {
-                    _id: "$servers.ip",
-                    //push users id
-                    users_id: {
-                        $push:"$_id"
-                    },
-                    count: {
-                        $sum: 1
-                    }
-                }
-            }, {
-                //having
-                $match: {
-                    //$qt = >
-                    count: {
-                        $gt: 1
-                    }
-                }
-            }, {
-                $sort: {
-                    "count": -1
-                }
-            }]);
+            //     //group by and count the same servers by users
+            //     "$group": {
+            //         _id: "$servers.ip",
+            //         //push users id
+            //         users_id: {
+            //             $push:"$_id"
+            //         },
+            //         count: {
+            //             $sum: 1
+            //         }
+            //     }
+            // }, {
+            //     //having
+            //     $match: {
+            //         //$qt = >
+            //         count: {
+            //             $gt: 1
+            //         }
+            //     }
+            // }, {
+            //     $sort: {
+            //         "count": -1
+            //     }
+            // }]);
             console.log(this.sharedServersUsers);
         } catch (e) {
             console.log(e)

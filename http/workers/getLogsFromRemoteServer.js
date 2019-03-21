@@ -16,6 +16,6 @@ module.exports = async function () {
     
     const logProcess = new LogProcess(channel);
 
-    setInterval(() => logProcess.getLog(), 15000);
+    //setInterval(() => logProcess.getLog(), 15000);
 
     }();

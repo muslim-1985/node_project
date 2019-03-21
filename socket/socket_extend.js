@@ -1,3 +1,4 @@
+const {BotUsersMessages} = require('../sequalize');
 module.exports = class Socket {
     constructor (model, io, bot) {
         this.model = model;
@@ -5,13 +6,15 @@ module.exports = class Socket {
         this.bot = bot;
     }
     async botOnMessage (message) {
-        await this.model.findOneAndUpdate({username: message.chat.username}, {$push: {userMessages:
-            { 
-                subject: message.text, 
-                username: message.chat.username, 
-                id: message.chat.id
-            }
-        }});
+        let user = await this.model.findOne({where: {username: message.chat.username}});
+
+        await BotUsersMessages.create({
+            subject: message.text,
+            username: message.chat.username,
+            chat_id: message.chat.id,
+            botUserId: user.id
+        })
+
         await this.io.emit('MESSAGE_BOT_USER', {
             message: message.text, 
             username: message.chat.username, 
@@ -20,11 +23,16 @@ module.exports = class Socket {
     }
     async botOnGetMessage (data) {
         try {
-            await this.model.findOneAndUpdate({chatId: data.chatId}, {$push: {userMessages:{ subject: data.message, username: data.username}}});
+            let user = await this.model.findOne({where: {chatId: data.chatId}});
+            await BotUsersMessages.create({
+                subject: data.message,
+                username: data.username,
+                botUserId: user.id
+            })
         } catch (e) {
             console.log(e)
         }
-        //передаем в комнату приватное сообщение котарая имее имя ай ди чата (выше мы ее создали)
+        
         await this.io.emit('MESSAGE', data);
         await this.bot.sendMessage(data.chatId, JSON.stringify(data.message));
     }

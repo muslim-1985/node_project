@@ -2,7 +2,7 @@ const Redis = require('ioredis');
 const node_ssh = require('node-ssh');
 const ssh = new node_ssh();
 const fs = require('fs');
-const UsersModel = require('../../../models/UsersModel');
+//const UsersModel = require('../../../models/UsersModel');
 const pub = new Redis();
 /*
      set data structure contains only unique elements,
@@ -15,7 +15,7 @@ module.exports = class Log {
     constructor (channel) {
         this.ssh = ssh;
         this.fs = fs;
-        this.UsersModel = UsersModel;
+        this.UsersModel = 'model';//UsersModel;
         this.logFileSize = logFileSize;
         this.logState = logState;
         this.pub = pub;

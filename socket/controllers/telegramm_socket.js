@@ -1,5 +1,5 @@
 
-const BotUsers = require ('../../models/botUsers');
+const {BotUsers} = require ('../../sequalize');
 const Socket = require ('../socket_extend')
 
 module.exports = class BotRealtime extends Socket {

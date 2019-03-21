@@ -1,9 +1,9 @@
-const botUsers = require('../../models/botUsers');
+const {BotUsers, BotUsersMessages} = require('../../sequalize');
 
 module.exports = {
     async getAllUsers (req, res) {
         try {
-            let allUsers = await botUsers.find({});
+            let allUsers = await BotUsers.findAll({include: [BotUsersMessages]});
             res.json(allUsers);
         } catch (e) {
             console.log(e);
@@ -11,9 +11,7 @@ module.exports = {
     },
     async getUserMessages (req, res) {
         try {
-            let userMessages = await botUsers.findOne({chatId: req.params.chatId});
-            //записываем айдишник чата в сессию
-            //req.session.chatId = req.params.chatId;
+            let userMessages = await BotUsers.findOne({where: {chatId: req.params.chatId}});
             res.json(userMessages);
         } catch (e) {
             console.log(e)

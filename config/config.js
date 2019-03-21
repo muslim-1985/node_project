@@ -19,7 +19,13 @@ const dev = {
         host: process.env.DEV_DB_HOST || 'localhost',
         port: parseInt(process.env.DEV_DB_PORT) || 27017,
         name: process.env.DEV_DB_NAME || 'db'
-    }
+    },
+    pdb: {
+        host: process.env.P_DB_HOST || 'localhost',
+        dbname: process.env.P_DB_NAME || 'root',
+        user: process.env.P_DB_USER || 'root',
+        pass: process.env.P_DB_PASS || 'root'
+    },
 };
 const test = {
     app: {

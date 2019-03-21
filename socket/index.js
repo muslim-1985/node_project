@@ -8,11 +8,10 @@ const bot = new TelegramBot(config.app.botToken, {polling: true});
 //bot.setWebHook(config.app.url);
 const jwt = require('jsonwebtoken');
 const botRealtime = require('./controllers/telegramm_socket');
-const Users = require('../models/UsersModel');
-const BotUsers = require ('../models/botUsers');
+const {BotUsers} = require('../sequalize');
 
 bot.onText(/\/start/, async msg => {
-        let result = await BotUsers.find({username: msg.chat.username});
+        let result = await BotUsers.findAll({where: {chatId: msg.chat.id}});
         // //добавляем аватар
         let photos =  await bot.getUserProfilePhotos(msg.from.id);
         let staticPath = 'not-found';
