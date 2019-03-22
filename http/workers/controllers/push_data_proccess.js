@@ -18,14 +18,16 @@ module.exports = {
     async setLogs(req, res) {
         let user;
         try {
-            let use = await User.findOne({where:{id: req.body.userId}});
+            let {username, privateKey, passpharse, ip, userId} = req.body;
+            
             await UserServers.create({
-                username: req.body.username,
-                key: req.body.privateKey,
-                passpharse: req.body.passpharse,
-                ip: req.body.ip,
-                userId: use.id
+                username,
+                key: privateKey,
+                passpharse,
+                ip,
+                userId
             });
+            
             user = await User.findOne({include: [UserServers], where: { id: req.body.userId },})
             
         } catch (e) {

@@ -33,4 +33,4 @@ sequalize.sync()
         console.log('database user created')
     })
 
-module.exports = {User, BotUsers, UserServers, UserServersLogs, BotUsersMessages};    
+module.exports = {User, BotUsers, UserServers, UserServersLogs, BotUsersMessages, sequalize};    
