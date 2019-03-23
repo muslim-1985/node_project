@@ -7,9 +7,6 @@ module.exports = (sequalize, type) => {
         },
         type: type.STRING,
         text: type.TEXT,
-        passpharse: {
-            type: type.STRING,
-            allowNull: false
-        },
+        log_file_size: type.INTEGER
     })
-}
+};

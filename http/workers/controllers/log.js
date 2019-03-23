@@ -1,23 +1,13 @@
 const Redis = require('ioredis');
 const node_ssh = require('node-ssh');
+const {UserServersLogs} = require('../../../sequalize');
 const ssh = new node_ssh();
 const fs = require('fs');
-//const UsersModel = require('../../../models/UsersModel');
 const pub = new Redis();
-/*
-     set data structure contains only unique elements,
-     and therefore it is impossible to write the same data
-    **/
-let logFileSize = new Set();
-let logState = false;
 
 module.exports = class Log {
     constructor (channel) {
-        this.ssh = ssh;
         this.fs = fs;
-        this.UsersModel = 'model';//UsersModel;
-        this.logFileSize = logFileSize;
-        this.logState = logState;
         this.pub = pub;
         this.channel = channel;
     }
@@ -37,7 +27,7 @@ module.exports = class Log {
            agent: process.env.SSH_AUTH_SOCK
        })
    }
-   async execRemoteServer(cwdFilePath, filePath, logFile, userId, serverId,sharedServers, state) {
+   async execRemoteServer(cwdFilePath, filePath, logFile, userId, serverId, sharedServers) {
        try {
            //check change error.log file size from remote server
            let exec = await ssh.execCommand(`wc -c < ${logFile}`, {
@@ -47,48 +37,66 @@ module.exports = class Log {
                    pty: true
                }
            });
-           await this.logFileSize.add(exec.stdout)
-           for await (let item of this.logFileSize) {
-               if (this.logFileSize.size > 1) {
-                   //change global state
-                   this.logState = true;
-                   this.logFileSize.delete(item)
+           let log = await ssh.execCommand(`tail < ${logFile}`, {
+               cwd: cwdFilePath,
+               stream: 'stdout',
+               options: {
+                   pty: true
+               }
+           });
+            const logFileSizeDb = await UserServersLogs.findOne({ attributes:['log_file_size'], where: {userServerId: serverId}, order:[['id','DESC']]});
+
+           if(logFileSizeDb == null || logFileSizeDb.log_file_size < exec.stdout) {
+               if(sharedServers.length > 0) {
+                   for (let servers of sharedServers) {
+                       console.log(servers.userId);
+                       try {
+                           await UserServersLogs.create({
+                               type: 'apache',
+                               text: log.stdout,
+                               userServerId: servers.id,
+                               log_file_size: exec.stdout,
+                           });
+                           let convertData = await {fileData: log.stdout, userId: servers.userId};
+                           let obj = await JSON.stringify(convertData);
+                           await this.pub.publish(this.channel, obj);
+                       } catch(e) {
+                           console.log(e)
+                       }
+                   }
+               } else {
+                   try {
+                       await UserServersLogs.create({
+                           type: 'apache',
+                           text: log.stdout,
+                           userServerId: serverId,
+                           log_file_size: exec.stdout,
+                       });
+                       let convertData = await {fileData: log.stdout, userId};
+                       let obj = await JSON.stringify(convertData);
+                       await this.pub.publish(this.channel, obj);
+                   } catch(e) {
+                       console.log(e)
+                   }
                }
            }
-           console.log(this.logFileSize.size)
-
-           await this._publishFileData(logFile, filePath, userId, serverId, sharedServers, state);
        } catch (e) {
            console.log('STDERR: ' + exec.stderr)
        }
    }
-   /*
-    private method
-   */
-   async _publishFileData(logFile, filePath, userId, serverId, sharedServers, state) {
-       console.log(state)
-    
-       console.log(sharedServers)
-       if (this.logState) {
-
-           try {
-               this.logState = false;
-               await this.ssh.getFile(`./log_ssh/${userId}/${serverId}/${logFile}`, filePath);
-               this.fs.readFile(`./log_ssh/${userId}/${serverId}/${logFile}`, {
-                   encoding: 'utf-8'
-               }, (err, data) => {
-                   if (!err) {
-                       let convertData = {fileData: data.toString().split("\n"), userId};
-                       let obj = JSON.stringify(convertData);
-                       this.pub.publish(this.channel, obj);
-                   } else {
-                       console.log(err);
-                       this.pub.disconnect();
-                   }
-               });
-           } catch (e) {
-               console.log(e)
-           }
+   async _createAndPublish (id, userid) {
+       try {
+           await UserServersLogs.create({
+               type: 'apache',
+               text: log.stdout,
+               userServerId: id,
+               log_file_size: exec.stdout,
+           });
+           let convertData = await {fileData: log.stdout, userid};
+           let obj = await JSON.stringify(convertData);
+           await this.pub.publish(this.channel, obj);
+       } catch(e) {
+           console.log(e)
        }
    }
-}
+};

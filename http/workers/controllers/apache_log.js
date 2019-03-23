@@ -9,7 +9,6 @@ module.exports = class LogProcess extends Log {
         this.sharedServers;
     }
     async getLog() {
-
         try {
             this.users = await User.findAll({
                 include: [UserServers],
@@ -17,31 +16,33 @@ module.exports = class LogProcess extends Log {
                     watch: true
                 }
             });
-           
-            this.sharedServersUsers = await sequalize.query('SELECT user_servers.ip, COUNT(user_servers.ip) FROM users JOIN user_servers ON users.id=user_servers."userId" WHERE users.watch=true GROUP BY user_servers.ip HAVING COUNT(user_servers.ip) > 1', {
+
+            this.sharedServersUsers = await sequalize.query('SELECT user_servers.ip, COUNT(user_servers.ip) FROM users ' +
+                'JOIN user_servers ON users.id=user_servers."userId" ' +
+                'WHERE users.watch=true ' +
+                'GROUP BY user_servers.ip ' +
+                'HAVING COUNT(user_servers.ip) > 1', {
                 type: sequalize.QueryTypes.SELECT
-            })
+            });
 
             const arr = [];
-            console.log(this.sharedServersUsers)
+
             if (this.sharedServersUsers.length > 0) {
                 for await (let ip of this.sharedServersUsers) {
                     arr.push(ip.ip);
                 }
-
-                this.sharedServers = await sequalize.query(`SELECT "userId", id, ip FROM user_servers WHERE ip in (?) ORDER BY "userId" ASC`, {
+                this.sharedServers = await sequalize.query('SELECT "userId", id, ip FROM user_servers ' +
+                    'WHERE ip in (?) ' +
+                    'ORDER BY "userId" ASC', {
                     replacements: [arr],
                     type: sequalize.QueryTypes.SELECT
                 })
             }
-
         } catch (e) {
             console.log(e)
         }
-        
          if(this.users.length > 0) {
             for (let user of this.users) {
-
                 user.user_servers.map(async server => {
                     try {
                         let {
@@ -57,8 +58,7 @@ module.exports = class LogProcess extends Log {
                             passpharse
                         });
                         try {
-                            let state = false;
-                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user.id, server.id, this.sharedServers, state)
+                            await this.execRemoteServer('/var/log/apache2', '/var/log/apache2/error.log', 'error.log', user.id, server.id, this.sharedServers)
                         } catch (e) {
                             console.log(e)
                         }
@@ -68,6 +68,5 @@ module.exports = class LogProcess extends Log {
                 })
             }
         }
-
     }
-}
+};

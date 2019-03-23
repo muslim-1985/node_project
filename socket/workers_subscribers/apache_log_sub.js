@@ -2,6 +2,7 @@
 module.exports = async function(redis, io) {
     let nsp = io.of('/log');
     let ser  = 0;
+
     nsp.on('connection', function(socket){
         socket.on('create', function(room) {
             socket.join(room);
@@ -14,18 +15,18 @@ module.exports = async function(redis, io) {
                     console.log(e)
                 }
                 let mes = await JSON.stringify(result.fileData);
-                console.log(mes)
+                console.log(mes);
                 await nsp.to(result.userId).emit('log', mes);
-               // console.log(`Received the following message from ${channel}: ${message}`);
+                console.log(`Received the following message from ${channel}: ${message}`);
             });
           });
         socket.on('leav', function(room){
             socket.leave(room);
             console.log('leave')
-        })  
+        });
         console.log('someone connected');
     });
-    
+
     const channel = 'logData';
     
     redis.subscribe(channel, (error, count) => {
