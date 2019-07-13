@@ -1,12 +1,10 @@
 module.exports = (sequalize, type) => {
-    return sequalize.define ('user_messages', {
-        id : {
+    return sequalize.define('tags', {
+        id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        subject: type.TEXT,
-        username: type.STRING,
-        chat_id: type.INTEGER
+        title: type.STRING
     })
 };

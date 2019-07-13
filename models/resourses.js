@@ -1,12 +1,11 @@
 module.exports = (sequalize, type) => {
-    return sequalize.define ('server_logs', {
+    return sequalize.define ('resourses', {
         id : {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        type: type.STRING,
-        text: type.TEXT,
-        log_file_size: type.INTEGER
+        name: type.STRING,
+        watch: { type: type.BOOLEAN, defaultValue: false }
     })
 };

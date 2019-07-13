@@ -8,7 +8,7 @@ const Admin = require('../http/controllers/admin');
 const BotUsers = require('../http/controllers/botUsers');
 const multer = require('multer');
 const {checkAuth} = require('../http/middlewares/checkAuth');
-const log = require('../http/workers/controllers/push_data_proccess');
+const {validateRegister, validateLogin} = require('../http/middlewares/validate');
 //промежуточная функция сохранения файла на сервере и в бд
 const storage = multer.diskStorage({
     destination (req, file, cb) {
@@ -39,20 +39,15 @@ route.use(function(req, res, next) {
 route.options('/', cors());
 route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
-route.options('/apacheLogs', cors());
-route.options('/setLogs', cors());
 
 route.get('/', checkAuth, Admin.resPage);
 //botUsers controller
-route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
+route.get('/botUsers', checkAuth, BotUsers.getAllUsersAndMessages);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
-//workers
-route.post('/apacheLogs', checkAuth, log.getUser);
-route.post('/setLogs', checkAuth, log.setLogs);
 
-route.post('/login', Admin.login);
+route.post('/login', validateLogin(), Admin.login);
 
-route.post('/register', Admin.register);
+route.post('/register', validateRegister(), Admin.register);
 
 // route.post('/logout', (req, res) => {
 //     res.clearCookie('token');

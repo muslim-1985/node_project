@@ -1,7 +1,7 @@
 const {BotUsers, BotUsersMessages} = require('../../sequalize');
 
 module.exports = {
-    async getAllUsers (req, res) {
+    async getAllUsersAndMessages(req, res) {
         try {
             let allUsers = await BotUsers.findAll({include: [BotUsersMessages]});
             res.json(allUsers);
@@ -9,7 +9,7 @@ module.exports = {
             console.log(e);
         }
     },
-    async getUserMessages (req, res) {
+    async getUserMessages(req, res) {
         try {
             let userMessages = await BotUsers.findOne({where: {chatId: req.params.chatId}});
             res.json(userMessages);

@@ -1,10 +1,12 @@
-
-const {User} = require('../../sequalize')
+const {User} = require('../../sequalize');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../../config/config');
+const {validationResult} = require('express-validator/check');
+// const Redis = require('ioredis');
+// const redis = new Redis();
 
-function createToken (body) {
+function createToken(body) {
     return jwt.sign(
         body,
         config.app.jwt.secretOrKey,
@@ -12,8 +14,16 @@ function createToken (body) {
     );
 }
 
+function validateErr(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array());
+    }
+    return false;
+}
+
 module.exports = {
-    async resPage (req, res) {
+    async resPage(req, res) {
         try {
             let users = await User.findAll({});
             res.status(200).json(users);
@@ -21,25 +31,19 @@ module.exports = {
             res.status(500).send('Ошибка сервера');
             console.log(e)
         }
-
     },
-   
-    // async getUserAdminMessages (req, res) {
-    //     try {
-    //         let userMessages = await UsersModel.findOne({chatId: req.params.chatId});
-    //         res.json(userMessages);
-    //     } catch (e) {
-    //         console.log(e)
-    //     }
-    // },
-    async login (req, res) {
+    async login(req, res) {
+        if (validateErr(req, res)) {
+            return validateErr(req, res)
+        }
         try {
-            let user = await User.findOne({ where: {name:req.body.username}});
-            if(user != void(0) && bcrypt.compareSync(req.body.password, user.password)) {
-                const token = createToken({id: user.id, username: user.name});
-                res.json({message: "User login success", userId: user.id, token});
-            }
-             else res.status(400).send({message: "User not exist or password not correct"});
+            let user = await User.findOne({where: {name: req.body.username}});
+            let {id, username, password} = user;
+
+            if (user != void (0) && bcrypt.compareSync(req.body.password, password)) {
+                const token = createToken({id, username});
+                res.json({message: "User login success", userId: id, token});
+            } else res.status(400).send({message: "User not exist or password not correct"});
         } catch (e) {
             console.error("E, login,", e);
             res.status(500).send({message: "some error"});
@@ -47,9 +51,13 @@ module.exports = {
     },
 
     async register(req, res) {
+        if (validateErr(req, res)) {
+            return validateErr(req, res)
+        }
         try {
             let user = await User.findOne({where: {name: req.body.username}});
-            if(user != void(0)) return res.status(400).send({message: "Пользователь уже зарегестрирован в системе"});
+            if (user != void (0)) return res.status(400).send({message: "User is already registered in the system."});
+            if (req.body.password !== req.body.repeatPassword) return res.status(400).send({message: "Passwords do not match"});
             let pass = await bcrypt.hash(req.body.password, 12);
             user = await User.create({
                 name: req.body.username,

@@ -8,11 +8,12 @@ module.exports = (sequalize, type) => {
         },
         name: type.STRING,
         email: type.STRING,
+        avatar: type.STRING,
         password: {
             type: type.STRING,
             allowNull: false
         },
-        role: type.STRING,
+        role_id: type.INTEGER,
         watch: { type: type.BOOLEAN, defaultValue: false }
     })
-}
+};

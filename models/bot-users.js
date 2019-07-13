@@ -1,6 +1,6 @@
 module.exports = (sequalize, type) => {
-    return sequalize.define ('bot_users', {
-        id : {
+    return sequalize.define('bot_users', {
+        id: {
             type: type.INTEGER,
             primaryKey: true,
             autoIncrement: true
@@ -12,4 +12,4 @@ module.exports = (sequalize, type) => {
         avatar: type.STRING,
         watch: type.BOOLEAN
     })
-}
+};
