@@ -13,7 +13,7 @@ module.exports = (sequalize, type) => {
             type: type.STRING,
             allowNull: false
         },
-        role_id: type.INTEGER,
+        role_id: {type: type.INTEGER, defaultValue: 1},
         watch: { type: type.BOOLEAN, defaultValue: false }
     })
 };

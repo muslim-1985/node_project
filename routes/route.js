@@ -40,7 +40,7 @@ route.options('/', cors());
 route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
 
-route.get('/', checkAuth, Admin.resPage);
+route.get('/', checkAuth('hello'), Admin.resPage);
 //botUsers controller
 route.get('/botUsers', checkAuth, BotUsers.getAllUsersAndMessages);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
