@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrtypt = require('bcryptjs');
 const BotUsers = require('./botUsers');
+const RolesPermissionsModel = require('./RolesPermissonsModel');
 mongoose.model('BotUsers');
+mongoose.model('RolesPermissionsModel');
+const user = "user";
 
 const UsersSchema = new Schema({
     username: {type: String},
@@ -10,8 +13,14 @@ const UsersSchema = new Schema({
     email: {type: String, unique: true},
     addedAt: {type: Date, default: Date.now},
     avatar: String,
-    watch: Boolean,
-    servers: [{username: {type: String}, key: {type: String}, passpharse: {type: String}, ip: {type: String}, logs: [{subject: {type: String}, addedAt: {type: Date, default: Date.now}}]} ],
+    watch: {type: Boolean, default: true},
+    banned: {type: Boolean, default: false},
+    roles: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'RolesPermissionsModel'
+        }
+    ],
     botUsers: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'BotUsers'
@@ -21,9 +30,18 @@ const UsersSchema = new Schema({
     collection: "UsersCollection"
 });
 
-UsersSchema.pre('save', function(next) {
-    if(this.isModified('password') || this.isNew()) {
+UsersSchema.pre('save', function (next) {
+    if (this.isModified('password') || this.isNew()) {
         this.password = bcrtypt.hashSync(this.password, 12);
+    }
+    next();
+});
+
+//create default user
+UsersSchema.pre('save', async function (next) {
+    if (Array.isArray(this.roles) && this.roles.length === 0) {
+       let req =  await RolesPermissionsModel.findOne({name: user});
+       this.roles.push(req._id);
     }
     next();
 });

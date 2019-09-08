@@ -1,6 +1,6 @@
 
 const BotUsers = require ('../../models/botUsers');
-const Socket = require ('../socket_extend')
+const Socket = require ('../socket_extend');
 
 module.exports = class BotRealtime extends Socket {
     constructor (io, bot) {
@@ -18,4 +18,4 @@ module.exports = class BotRealtime extends Socket {
             })
         })
     }
-}
+};

@@ -28,4 +28,4 @@ module.exports = class Socket {
         await this.io.emit('MESSAGE', data);
         await this.bot.sendMessage(data.chatId, JSON.stringify(data.message));
     }
-}
+};

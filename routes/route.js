@@ -7,9 +7,10 @@ const cors = require('cors');
 const Admin = require('../http/controllers/admin');
 const BotUsers = require('../http/controllers/botUsers');
 const LittleBot = require('../http/controllers/LittleBot');
+const Auth = require('../http/controllers/Auth');
 const multer = require('multer');
 const {checkAuth} = require('../http/middlewares/checkAuth');
-const log = require('../http/workers/controllers/push_data_proccess');
+const {validateRegister, validateLogin, validateRoles} = require('../http/middlewares/validate');
 //промежуточная функция сохранения файла на сервере и в бд
 const storage = multer.diskStorage({
     destination (req, file, cb) {
@@ -38,32 +39,21 @@ route.use(function(req, res, next) {
 });
 
 route.options('/', cors());
-route.options('/goods', cors());
-route.options('/getGood', cors());
-route.options('/deleteGood', cors());
 route.options('/botUsers', cors());
 route.options('/botUsers:chatId', cors());
-route.options('/apacheLogs', cors());
-route.options('/setLogs', cors());
 
 route.get('/', checkAuth, Admin.resPage);
-route.post('/info', checkAuth, Admin.setCategory);
-route.post('/setGood', checkAuth, upload.single('image'), Admin.setGood);
-route.get('/getGood', checkAuth, Admin.getGood);
-route.post('/deleteGood', checkAuth, Admin.deleteGood);
-route.get('/goods', checkAuth, Admin.getCategory);
+//route.post('/setGood', checkAuth, upload.single('image'), Admin.setGood);
 //botUsers controller
 route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
 route.get('/userAdminMessages/:chatId', checkAuth, Admin.getUserAdminMessages);
 route.post('/deleteMessage', checkAuth, LittleBot.deleteMessage);
-//workers
-route.post('/apacheLogs', checkAuth, log.getUser);
-route.post('/setLogs', checkAuth, log.setLogs);
 
-route.post('/login', Admin.login);
+route.post('/login', validateLogin(), Auth.login);
 
-route.post('/register', Admin.register);
+route.post('/register', validateRegister(), Auth.register);
+route.post('/createRole', checkAuth, validateRoles(), Auth.createRole);
 
 // route.post('/logout', (req, res) => {
 //     res.clearCookie('token');
