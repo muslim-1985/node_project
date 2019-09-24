@@ -2,6 +2,8 @@ const passport = require('passport');
 const {Strategy, ExtractJwt} = require('passport-jwt');
 const config = require('../../config/config');
 const UserModel = require('../../models/UsersModel');
+const mainRole = 'admin';
+const noAccess = 'no_access';
 //получаем jwt токен из заголовков fromAuthHeaderAsBearerToken()
 //и сравниваем с секретным ключем
 let jwtOptions = {
@@ -25,23 +27,23 @@ module.exports = {
                 console.log(jwtError);
                 return res.status(500).json({err:'Ошибка аутентификации, передан неверный токен', jwtError});
             }
-            console.log(req.path);
             req.user = decryptToken;
             UserModel.findOne({
                 username: req.user.username
             })
-                .populate('roles')
+                .populate('role')
                 .then((data) => {
-                for (let res of data.roles) {
-                    if (res.name === 'admin') {
-                        next();
+                    const {name, permissions} = data.role;
+                    if(name === mainRole) {
+                        next()
                     }
-                    for (let permission of res.permissions) {
-                        console.log(permission)
+                    for (const permission of permissions) {
+                        if (permission.action === noAccess && req.path === permission.path && permission.method === req.method) {
+                            return res.status(500).json({err: "Forbidden. Access denied"});
+                        }
                     }
-                }
+                    next()
             });
-            next()
         })(req, res, next);
     }
 };

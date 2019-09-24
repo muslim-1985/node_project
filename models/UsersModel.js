@@ -15,12 +15,10 @@ const UsersSchema = new Schema({
     avatar: String,
     watch: {type: Boolean, default: true},
     banned: {type: Boolean, default: false},
-    roles: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'RolesPermissionsModel'
-        }
-    ],
+    role:  {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RolesPermissionsModel'
+    },
     botUsers: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'BotUsers'
@@ -39,9 +37,9 @@ UsersSchema.pre('save', function (next) {
 
 //create default user
 UsersSchema.pre('save', async function (next) {
-    if (Array.isArray(this.roles) && this.roles.length === 0) {
+    if (!this.role) {
        let req =  await RolesPermissionsModel.findOne({name: user});
-       this.roles.push(req._id);
+       this.role = req._id;
     }
     next();
 });

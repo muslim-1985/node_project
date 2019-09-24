@@ -56,12 +56,12 @@ module.exports = {
                 }
             }).lean().exec();
             if (user != void (0)) return res.status(400).send({message: "Пользователь уже зарегестрирован в системе"});
-            let {username, password, email, roles} = req.body;
+            let {username, password, email, role} = req.body;
             user = await UsersModel.create({
                 username,
                 password,
                 email,
-                roles
+                role
             });
 
             const token = createToken({id: user._id, username: user.username});
@@ -77,13 +77,13 @@ module.exports = {
         if (validateErr(req, res)) {
             return validateErr(req, res)
         }
-        let {name, permissions} = req.body;
+        let {name, permissions, method} = req.body;
         let role = await RolesModel.findOne({name});
         if (role != void(0)) {
             return res.status(400).send({message: "Role exist"});
         }
         role = await RolesModel.create({
-            name, permissions
+            name, permissions, method
         });
         return res.status(200).send({message: role});
     }

@@ -45,6 +45,7 @@ route.options('/botUsers:chatId', cors());
 route.get('/', checkAuth, Admin.resPage);
 //route.post('/setGood', checkAuth, upload.single('image'), Admin.setGood);
 //botUsers controller
+route.get('/admin', checkAuth, BotUsers.getAllUsers);
 route.get('/botUsers', checkAuth, BotUsers.getAllUsers);
 route.get('/userMessages/:chatId', checkAuth, BotUsers.getUserMessages);
 route.get('/userAdminMessages/:chatId', checkAuth, Admin.getUserAdminMessages);
