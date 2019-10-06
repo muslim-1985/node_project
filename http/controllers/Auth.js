@@ -1,6 +1,8 @@
 const UsersModel = require('../../models/UsersModel');
 const RolesModel = require('../../models/RolesPermissonsModel');
+const Routes = require('../../models/Routes');
 const {validationResult} = require('express-validator');
+const route = require('../../routes/route');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -86,5 +88,9 @@ module.exports = {
             name, permissions, method
         });
         return res.status(200).send({message: role});
+    },
+    async getAllRoutes(req, res) {
+        let c = route.rot().map(route => route.route.path);
+        let entities = [...new Set(c)];
     }
 };

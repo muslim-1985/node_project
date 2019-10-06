@@ -11,6 +11,14 @@ const Auth = require('../http/controllers/Auth');
 const multer = require('multer');
 const {checkAuth} = require('../http/middlewares/checkAuth');
 const {validateRegister, validateLogin, validateRoles} = require('../http/middlewares/validate');
+
+function rot() {
+    let routes = route.stack;
+    routes = routes.filter(route => typeof route.route != 'undefined');
+    return routes
+}
+module.exports.rot = rot;
+
 //промежуточная функция сохранения файла на сервере и в бд
 const storage = multer.diskStorage({
     destination (req, file, cb) {
@@ -55,6 +63,7 @@ route.post('/login', validateLogin(), Auth.login);
 
 route.post('/register', validateRegister(), Auth.register);
 route.post('/createRole', checkAuth, validateRoles(), Auth.createRole);
+route.get('/getRoutes', Auth.getAllRoutes);
 
 // route.post('/logout', (req, res) => {
 //     res.clearCookie('token');
